@@ -13,6 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//example - CRUD 
 model User {
   id Int @default(autoincrement()) @id
   name String 
@@ -28,8 +29,302 @@ model Class {
   sid Int @default(autoincrement()) @id
   name String
 }
+//-------------------END of Example CRUD --------------
 
-model Classes {
-  sid Int @default(autoincrement()) @id
-  name String
+model Parent {
+  parentId    Int     @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  email       String  @unique
+  password    String
+  image       String?
+  bloodGroup  String?
+  phoneNumber String  @unique
+  address     String?
+
+  // Relations
+  children     ParentChild[]
+  oldPasswords OldPasswords[]
+  MedicineCus  MedicineCus[]
+}
+
+model Child {
+  childId    Int      @id @default(autoincrement())
+  firstName  String
+  middleName String?
+  lastName   String
+  birthday   DateTime
+  region     String
+  image      String?
+  gender     String
+  bloodGroup String?
+
+  // Relations
+  parents        ParentChild[]
+  nursing        Nursing[]
+  bottles        Bottle[]
+  solids         Solids[]
+  Medication     Medication[]
+  SolidsAlergy   SolidsAlergy[]
+  MilkAlergy     MilkAlergy[]
+  MedicineAlergy MedicineAlergy[]
+  OtherAlergy    OtherAlergy[]
+  Growth         Growth[]
+  Sleep          Sleep[]
+}
+
+model ParentChild {
+  id    Int      @id @default(autoincrement())
+  parentId      Int
+  childId       Int
+  relation      String
+  status        String
+  requestedDate DateTime
+
+  // Relations
+  parent Parent @relation(fields: [parentId], references: [parentId])
+  child  Child  @relation(fields: [childId], references: [childId])
+
+}
+
+model OldPasswords {
+  id    Int      @id @default(autoincrement())
+  parentId  Int
+  password  String
+  changedOn DateTime
+
+  // Relations
+  parent Parent @relation(fields: [parentId], references: [parentId])
+
+
+}
+
+model Nursing {
+  id            Int      @id @default(autoincrement())
+  childId       Int
+  date          DateTime
+  time          DateTime
+  leftDuration  Int?
+  rightDuration Int?
+  notes         String?
+
+  // Relations
+  child Child @relation(fields: [childId], references: [childId])
+}
+
+model Bottle {
+  id      Int      @id @default(autoincrement())
+  childId Int
+  typeId  Int
+  volume  Float?
+  stash   Float?
+  date    DateTime
+  time    DateTime
+  notes   String?
+
+  // Relations
+  child    Child    @relation(fields: [childId], references: [childId])
+  milkType MilkType @relation(fields: [typeId], references: [typeID])
+}
+
+model Solids {
+  solidId  Int      @id @default(autoincrement())
+  childId  Int
+  reaction String?
+  note     String?
+  date     DateTime
+  time     DateTime
+
+  // Relations
+  child      Child      @relation(fields: [childId], references: [childId])
+  categories SolidCat[]
+}
+
+model SolidCat {
+  id    Int      @id @default(autoincrement())
+  solidId      Int
+  itemId       Int    @unique
+  weightVolume Float?
+
+  // Relations
+  solid        Solids         @relation(fields: [solidId], references: [solidId])
+  categoryItem CategoryItems  @relation(fields: [itemId], references: [itemId])
+  SolidsAlergy SolidsAlergy[]
+
+ 
+}
+
+model Category {
+  categoryId Int    @id @default(autoincrement())
+  name       String
+
+  // Relations
+  items CategoryItems[]
+}
+
+model CategoryItems {
+  itemId     Int     @id @default(autoincrement())
+  categoryId Int
+  isDefault  Boolean
+  parentId   Int?
+  weight     Float?
+
+  // Relations
+  category  Category   @relation(fields: [categoryId], references: [categoryId])
+  solidCats SolidCat[]
+
+  @@unique([categoryId, itemId])
+}
+
+model MilkType {
+  typeID   Int    @id @default(autoincrement())
+  milkType String
+
+  // Relations
+  bottles    Bottle[]
+  MilkAlergy MilkAlergy[]
+}
+
+model Medication {
+  id           Int      @id @default(autoincrement())
+  childId      Int
+  medID        Int
+  startingDate DateTime
+  endingDate   DateTime
+  frequency    String
+
+  // Relations
+  child    Child            @relation(fields: [childId], references: [childId])
+  medicine Medicine         @relation(fields: [medID], references: [medID])
+  slots    MedicationSlot[]
+}
+
+model MedicationSlot {
+  medicationSlotId Int       @id @default(autoincrement())
+  medicationId     Int
+  option           String
+  time             DateTime?
+  amount           Float
+  status           String // taken/missed
+
+  // Relations
+  medication Medication @relation(fields: [medicationId], references: [id])
+}
+
+model Medicine {
+  medID Int @id @default(autoincrement())
+
+  // Relations
+  medicationDefs MedicineDef[]
+  medicationCus  MedicineCus[]
+  medications    Medication[]
+  MedicineAlergy MedicineAlergy[]
+}
+
+model MedicineDef {
+  medID       Int    @id
+  name        String
+  description String
+  form        String // tablet, liquid, etc.
+
+  // Relations
+  medicine Medicine @relation(fields: [medID], references: [medID])
+}
+
+model MedicineCus {
+  medID       Int    @id
+  parentId    Int
+  name        String
+  description String
+  form        String
+
+  // Relations
+  medicine Medicine @relation(fields: [medID], references: [medID])
+  parent   Parent   @relation(fields: [parentId], references: [parentId])
+}
+
+model SolidsAlergy {
+  id    Int      @id @default(autoincrement())
+  itemId  Int
+  childId Int
+  note    String?
+
+  // Relations
+  solidCat SolidCat @relation(fields: [itemId], references: [itemId])
+  child    Child    @relation(fields: [childId], references: [childId])
+
+  
+}
+
+model MilkAlergy {
+  id    Int      @id @default(autoincrement())
+  typeId  Int
+  childId Int
+  note    String?
+
+  // Relations
+  milkType MilkType @relation(fields: [typeId], references: [typeID])
+  child    Child    @relation(fields: [childId], references: [childId])
+
+  
+}
+
+model MedicineAlergy {
+  id    Int      @id @default(autoincrement())
+  medId   Int
+  childId Int
+  note    String?
+
+  // Relations
+  medicine Medicine @relation(fields: [medId], references: [medID])
+  child    Child    @relation(fields: [childId], references: [childId])
+
+  
+}
+
+model OtherAlergy {
+  id         Int     @id @default(autoincrement())
+  childId    Int
+  allergicTo String
+  note       String?
+
+  // Relations
+  child Child @relation(fields: [childId], references: [childId])
+}
+
+model Growth {
+  id    Int      @id @default(autoincrement())
+  childId Int
+  date    DateTime
+  weight  Float?
+  height  Float?
+  note    String?
+
+  // Relations
+  child Child @relation(fields: [childId], references: [childId])
+
+  
+}
+
+model Sleep {
+  sleepId    Int      @id @default(autoincrement())
+  childId    Int
+  date       DateTime
+  startTime  DateTime
+  duration   Int // Duration in minutes 
+  note       String?
+  sleepStyle String?
+
+  // Relations
+  child Child @relation(fields: [childId], references: [childId])
+}
+
+model Article {
+  articleId Int      @id @default(autoincrement())
+  content   String
+  title     String
+  tag       String
+  image     String?  // Optional field
+  date      DateTime
+  author    String
 }
