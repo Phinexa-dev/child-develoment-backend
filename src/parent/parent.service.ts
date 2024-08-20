@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import {hash} from 'bcryptjs'
 import { DatabaseService } from 'src/database/database.service';
 
 
@@ -8,7 +9,9 @@ export class ParentService {
 constructor(private readonly databaseService: DatabaseService){}
 
   async create(createParentDto: Prisma.ParentCreateInput) {
-    return this.databaseService.parent.create({data:createParentDto})
+    return this.databaseService.parent.create({
+      data:{...createParentDto,password: await hash(createParentDto.password,10)}
+    })
   }
 
   async findAll() {
@@ -37,5 +40,17 @@ constructor(private readonly databaseService: DatabaseService){}
     return this.databaseService.parent.delete({
       where:{parentId}
     })
+    }
+
+    async findParent(email: string) {
+      const parent = await this.databaseService.parent.findUnique({
+        where:{
+          email,
+        }
+      })
+      if(!parent){
+        throw new NotFoundException("User not found")
+      }
+      return parent;
     }
 }

@@ -41,6 +41,7 @@ model Parent {
   bloodGroup  String?
   phoneNumber String  @unique
   address     String?
+  refreshToken String?
 
   // Relations
   children     ParentChild[]
