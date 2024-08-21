@@ -1,33 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ParentService } from './parent.service';
-import { Prisma } from '@prisma/client';
+import { Parent, Prisma } from '@prisma/client';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CurrentUser } from 'src/auth/current-user.decorator';
 
 @Controller('parent')
 export class ParentController {
   constructor(private readonly parentService: ParentService) {}
 
   @Post()
-  create(@Body() createParentDto: Prisma.ParentCreateInput) {
+  async create(@Body() createParentDto: Prisma.ParentCreateInput) {
     return this.parentService.create(createParentDto);
   }
 
   @Get()
-  findAll() {
+  @UseGuards(JwtAuthGuard)
+  async findAll(@CurrentUser() parent: Parent) {
+    console.log(parent)
     return this.parentService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     return this.parentService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateParentDto: Prisma.ParentUpdateInput) {
+  async update(@Param('id') id: string, @Body() updateParentDto: Prisma.ParentUpdateInput) {
     return this.parentService.update(+id, updateParentDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     return this.parentService.remove(+id);
   }
 }
