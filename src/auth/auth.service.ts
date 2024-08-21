@@ -62,6 +62,7 @@ async login (parent: Parent,response:Response){
         if(!authenticated){
             throw new UnauthorizedException();
         }
+        return user;
     } catch (error) {
         throw new UnauthorizedException('Refresh Token is not valid')
 
