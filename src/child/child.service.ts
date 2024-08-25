@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Child, Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 
@@ -95,7 +95,29 @@ export class ChildService {
     return updatedChild;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} child`;
+  async remove(id: number, parentId: number): Promise<void> {
+    // Find the child and include the parent association
+    const child = await this.databaseService.child.findUnique({
+      where: { childId:id },
+      include: { parents: true }, 
+    });
+
+    // Check if the child exists
+    if (!child) {
+      throw new NotFoundException(`Child with ID ${id} not found`);
+    }
+
+    // Check if the parent has access to delete this child
+    const parentChildRelation = child.parents.find(relation => relation.parentId === parentId);
+    if (!parentChildRelation) {
+      throw new ForbiddenException(`Parent with ID ${parentId} does not have access to delete this child`);
+    }
+
+    // Delete the child
+    await this.databaseService.child.delete({
+      where: { childId:id },
+    });
+
+    return;
   }
 }

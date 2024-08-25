@@ -17,25 +17,25 @@ export class ChildController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll(@CurrentUser() parent : Parent) {
+  findAll(@CurrentUser() parent: Parent) {
     return this.childService.findAll(parent.parentId);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: number,@CurrentUser() parent : Parent) {
+  findOne(@Param('id') id: number, @CurrentUser() parent: Parent) {
     return this.childService.findOne(+id, parent.parentId);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(@Param('id') id: string, @Body() updateChildDto: Prisma.ChildUpdateInput,@CurrentUser () parent:Parent) {
-    return this.childService.update(+id,updateChildDto,parent.parentId );
+  update(@Param('id') id: string, @Body() updateChildDto: Prisma.ChildUpdateInput, @CurrentUser() parent: Parent) {
+    return this.childService.update(+id, updateChildDto, parent.parentId);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: string) {
-    return this.childService.remove(+id);
+  remove(@Param('id') id: number, @CurrentUser() parent: Parent) {
+    return this.childService.remove(+id, parent.parentId);
   }
 }
