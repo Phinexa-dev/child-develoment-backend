@@ -11,12 +11,29 @@ import { isValid, parseISO } from 'date-fns';
 export class GrowthController {
   constructor(private readonly growthService: GrowthService) { }
 
-  @Post()
+  @Post('child/:childId')
   @UseGuards(JwtAuthGuard)
-  create(@Body() createGrowthDto: Prisma.GrowthCreateInput, @CurrentUser() parent: Parent) {
+  async create(
+    @Body() createGrowthDto: Prisma.GrowthCreateInput,
+    @CurrentUser() parent: Parent,
+    @Param('childId') childId: string,
+  ) {
+    const childIdNumber = parseInt(childId, 10);
+
+    if (isNaN(childIdNumber)) {
+      throw new BadRequestException('Invalid childId format.');
+    }
+
+    if (!createGrowthDto.child) {
+      createGrowthDto.child = {
+        connect: { childId: childIdNumber },
+      };
+    } else {
+      createGrowthDto.child.connect = { childId: childIdNumber };
+    }
+
     return this.growthService.create(createGrowthDto, parent.parentId);
   }
-
   @Get('child/:childId/date-range')
   @UseGuards(JwtAuthGuard)
   async getGrowthRecordsBetweenDates(

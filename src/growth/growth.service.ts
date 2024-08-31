@@ -5,6 +5,7 @@ import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class GrowthService {
+  
   constructor(private readonly databaseService:DatabaseService){}
 
   private async verifyParentChildRelation(parentId: number, childId: number) {
