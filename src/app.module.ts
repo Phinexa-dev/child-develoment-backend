@@ -24,7 +24,7 @@ import { ArticleModule } from './article/article.module';
     ChildModule,
     GrowthModule,
     SleepModule,
-  , ArticleModule],
+   ArticleModule],
   controllers: [AppController],
   providers: [AppService],
 })

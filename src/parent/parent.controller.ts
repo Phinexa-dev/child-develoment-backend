@@ -6,7 +6,7 @@ import { CurrentUser } from 'src/auth/current-user.decorator';
 
 @Controller('parent')
 export class ParentController {
-  constructor(private readonly parentService: ParentService) { }
+  constructor(private readonly parentService: ParentService) {}
 
   @Post()
   async create(@Body() createParentDto: Prisma.ParentCreateInput) {
