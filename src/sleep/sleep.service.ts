@@ -97,20 +97,4 @@ constructor(private readonly databaseService : DatabaseService){}
       where: { sleepId: sleepId },
     });
   }
-
-  // findAll() {
-  //   return `This action returns all sleep`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} sleep`;
-  // }
-
-  // update(id: number, updateSleepDto: UpdateSleepDto) {
-  //   return `This action updates a #${id} sleep`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} sleep`;
-  // }
 }
