@@ -6,6 +6,7 @@ import { DatabaseModule } from './database/database.module';
 import { SchoolsModule } from './schools/schools.module';
 import { ParentModule } from './parent/parent.module';
 import { AuthModule } from './auth/auth.module';
+import { ArticleModule } from './article/article.module';
 import { ChildModule } from './child/child.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { ChildModule } from './child/child.module';
     ParentModule,
     AuthModule,
     ChildModule,
+    ArticleModule
   ],
   controllers: [AppController],
   providers: [AppService],
