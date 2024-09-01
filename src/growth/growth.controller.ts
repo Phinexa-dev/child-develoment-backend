@@ -9,7 +9,7 @@ import { isValid, parseISO } from 'date-fns';
 
 @Controller('growth')
 export class GrowthController {
-  constructor(private readonly growthService: GrowthService) { }
+  constructor(private readonly growthService: GrowthService) {}
 
   @Post('child/:childId')
   @UseGuards(JwtAuthGuard)
