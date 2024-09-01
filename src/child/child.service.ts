@@ -6,7 +6,7 @@ import { DatabaseService } from 'src/database/database.service';
 @Injectable()
 export class ChildService {
 
-  constructor(private readonly databaseService: DatabaseService) { }
+  constructor(private readonly databaseService: DatabaseService) {}
 
   async create(createChildDto: Prisma.ChildCreateInput, parentId: number) {
 
