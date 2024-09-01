@@ -22,6 +22,7 @@ import { GrowthModule } from './growth/growth.module';
     AuthModule,
     ChildModule,
     GrowthModule,
+    ArticleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
