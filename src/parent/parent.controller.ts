@@ -14,7 +14,7 @@ export class ParentController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard) 
   async findAll(@CurrentUser() parent: Parent) {
     console.log(parent)
     return this.parentService.findAll();

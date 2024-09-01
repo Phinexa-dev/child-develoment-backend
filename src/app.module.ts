@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { ChildModule } from './child/child.module';
 import { GrowthModule } from './growth/growth.module';
 import { SleepModule } from './sleep/sleep.module';
+import { ArticleModule } from './article/article.module';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { SleepModule } from './sleep/sleep.module';
     ChildModule,
     GrowthModule,
     SleepModule,
-  ],
+  , ArticleModule],
   controllers: [AppController],
   providers: [AppService],
 })
