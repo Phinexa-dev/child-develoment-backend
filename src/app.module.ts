@@ -28,4 +28,4 @@ import { ArticleModule } from './article/article.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
