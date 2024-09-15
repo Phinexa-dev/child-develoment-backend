@@ -39,7 +39,6 @@ async login (parent: Parent,response:Response){
 
     response.cookie('Authentication',accessToken,{httpOnly:true, secure:false,   expires: expireAccessToken, }) //cahnge to true in production
     response.cookie('Refresh',refreshToken,{httpOnly:true, secure:false,   expires: expireRefreshToken, }) //cahnge to true in production
-
 }
 
  async verifyUser(email:string,password:string){
@@ -68,5 +67,4 @@ async login (parent: Parent,response:Response){
 
     }
  }
-
 }

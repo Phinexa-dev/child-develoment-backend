@@ -2,7 +2,6 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 
-
 @Injectable()
 export class GrowthService {
   
@@ -52,7 +51,6 @@ export class GrowthService {
     });
   }
 
-
   async findAll(parentId: number, childId: number) {
     await this.verifyParentChildRelation(parentId,childId)
     return this.databaseService.growth.findMany({
@@ -78,7 +76,6 @@ export class GrowthService {
     }
 
     await this.verifyParentChildRelation(parentId, growthRecord.childId);
-
  
     return this.databaseService.growth.update({
       where: { id: growthId },
@@ -91,13 +88,10 @@ export class GrowthService {
     const growthRecord = await this.databaseService.growth.findUnique({
       where: { id: growthId },
     });
-
     if (!growthRecord) {
       throw new NotFoundException(`Growth record with ID ${growthId} not found.`);
     }
-
     await this.verifyParentChildRelation(parentId, growthRecord.childId);
-
     return this.databaseService.growth.delete({
       where: { id: growthId },
     });

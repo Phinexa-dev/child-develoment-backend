@@ -10,7 +10,6 @@ export class ChildService {
 
   async create(createChildDto: Prisma.ChildCreateInput, parentId: number) {
 
-
     const child = await this.databaseService.child.create({
       data: {
         ...createChildDto,
@@ -28,7 +27,6 @@ export class ChildService {
 
     return child;
   }
-
 
   async findAll(parentId: number) {
     const activeChildren = await this.databaseService.parentChild.findMany({
@@ -48,7 +46,6 @@ export class ChildService {
 
   async findOne(id: number, parentId: number) {
 
-
     const parentChildRelation = await this.databaseService.parentChild.findFirst({
       where: {
         parentId: parentId,
@@ -57,17 +54,14 @@ export class ChildService {
       },
     });
 
-
     if (!parentChildRelation) {
       // If no relationship is found, throw an exception or return null
       throw new NotFoundException('Child does not belong to this parent or is not active.');
     }
 
-
     return this.databaseService.child.findUnique({
       where: {
         childId: id,
-
       }
     })
   }
@@ -85,13 +79,11 @@ export class ChildService {
     if (!parentChildRelation || parentChildRelation.status !== 'Active') {
       throw new UnauthorizedException('You are not authorized to update this child');
     }
-
     // Update the child
     const updatedChild = await this.databaseService.child.update({
       where: { childId: id },
       data: updateChildDto,
     });
-
     return updatedChild;
   }
 
@@ -101,18 +93,15 @@ export class ChildService {
       where: { childId:id },
       include: { parents: true }, 
     });
-
     // Check if the child exists
     if (!child) {
       throw new NotFoundException(`Child with ID ${id} not found`);
     }
-
     // Check if the parent has access to delete this child
     const parentChildRelation = child.parents.find(relation => relation.parentId === parentId);
     if (!parentChildRelation) {
       throw new ForbiddenException(`Parent with ID ${parentId} does not have access to delete this child`);
     }
-
     // Delete the child
     await this.databaseService.child.delete({
       where: { childId:id },
