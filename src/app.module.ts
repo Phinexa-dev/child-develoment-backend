@@ -6,9 +6,10 @@ import { DatabaseModule } from './database/database.module';
 import { SchoolsModule } from './schools/schools.module';
 import { ParentModule } from './parent/parent.module';
 import { AuthModule } from './auth/auth.module';
-import { ArticleModule } from './article/article.module';
 import { ChildModule } from './child/child.module';
 import { GrowthModule } from './growth/growth.module';
+import { SleepModule } from './sleep/sleep.module';
+import { ArticleModule } from './article/article.module';
 
 @Module({
   imports: [
@@ -22,8 +23,8 @@ import { GrowthModule } from './growth/growth.module';
     AuthModule,
     ChildModule,
     GrowthModule,
-    ArticleModule,
-  ],
+    SleepModule,
+   ArticleModule],
   controllers: [AppController],
   providers: [AppService],
 })
