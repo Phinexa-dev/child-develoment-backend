@@ -34,7 +34,7 @@ export class GrowthController {
 
     return this.growthService.create(createGrowthDto, parent.parentId);
   }
-  
+
   @Get('child/:childId/date-range')
   @UseGuards(JwtAuthGuard)
   async getGrowthRecordsBetweenDates(
@@ -55,15 +55,12 @@ export class GrowthController {
     if (!isValid(startDate) || !isValid(endDate)) {
       throw new BadRequestException('Invalid date format. Dates must be in ISO-8601 format.');
     }
-
-
     if (startDate > endDate) {
       throw new BadRequestException('Start date must be before end date.');
     }
-
-
     return this.growthService.getGrowthRecordsBetweenDates(parent.parentId, childIdNumber, startDate, endDate);
   }
+
   @Get('child/:childId')
   @UseGuards(JwtAuthGuard)
   async getAll(
@@ -78,7 +75,6 @@ export class GrowthController {
 
   }
   
-
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   async updateGrowth(
@@ -105,6 +101,4 @@ export class GrowthController {
     }
     return this.growthService.deleteGrowthRecord(parent.parentId, ID);
   }
-
-  // TODO : delete by the date if needed
 }

@@ -16,7 +16,6 @@ constructor(private readonly databaseService : DatabaseService){}
         status: 'Active',
       },
     });
-
     if (!parentChildRelation) {
       throw new UnauthorizedException('This child does not belong to the authenticated parent.');
     }
@@ -25,7 +24,6 @@ constructor(private readonly databaseService : DatabaseService){}
   async create(createSleepDto: Prisma.SleepCreateInput, parentId: number) {
 
     await this.verifyParentChildRelation(parentId, createSleepDto.child.connect.childId);
-
 
     return this.databaseService.sleep.create({
       data: {
@@ -90,7 +88,6 @@ constructor(private readonly databaseService : DatabaseService){}
     if (!sleepRecord) {
       throw new NotFoundException(`Sleep record with ID ${sleepId} not found.`);
     }
-
     await this.verifyParentChildRelation(parentId, sleepRecord.childId);
 
     return this.databaseService.sleep.delete({

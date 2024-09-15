@@ -7,7 +7,7 @@ import { CurrentUser } from 'src/auth/current-user.decorator';
 
 @Controller('child')
 export class ChildController {
-  constructor(private readonly childService: ChildService) { }
+  constructor(private readonly childService: ChildService) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)

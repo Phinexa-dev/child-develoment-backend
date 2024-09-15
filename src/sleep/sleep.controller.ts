@@ -10,7 +10,6 @@ import { isValid, parseISO } from 'date-fns';
 export class SleepController {
   constructor(private readonly sleepService: SleepService) {}
 
-
   @Post('child/:childId')
   @UseGuards(JwtAuthGuard)
   async create(
@@ -23,7 +22,6 @@ export class SleepController {
     if (isNaN(childIdNumber)) {
       throw new BadRequestException('Invalid childId format.');
     }
-
     if (!createSleepDto.child) {
       createSleepDto.child = {
         connect: { childId: childIdNumber },
@@ -31,7 +29,6 @@ export class SleepController {
     } else {
       createSleepDto.child.connect = { childId: childIdNumber };
     }
-
     return this.sleepService.create(createSleepDto, parent.parentId);
   }
 
@@ -44,22 +41,17 @@ export class SleepController {
     @CurrentUser() parent: Parent,
   ) {
     const childIdNumber = parseInt(childId, 10);
-
     if (isNaN(childIdNumber)) {
       throw new BadRequestException('Invalid childId format.');
     }
-
     const startDate = parseISO(start);
     const endDate = parseISO(end);
-
     if (!isValid(startDate) || !isValid(endDate)) {
       throw new BadRequestException('Invalid date format. Dates must be in ISO-8601 format.');
     }
-
     if (startDate > endDate) {
       throw new BadRequestException('Start date must be before end date.');
     }
-
     return this.sleepService.getSleepRecordsBetweenDates(parent.parentId, childIdNumber, startDate, endDate);
   }
 
@@ -74,7 +66,6 @@ export class SleepController {
     if (isNaN(childID)) {
       throw new BadRequestException('Invalid childId format.');
     }
-
     return this.sleepService.findAll(parent.parentId, childID);
   }
 
@@ -86,11 +77,9 @@ export class SleepController {
     @CurrentUser() parent: Parent,
   ) {
     const ID = parseInt(id, 10);
-    
     if (isNaN(ID)) {
       throw new BadRequestException('Invalid ID format.');
     }
-
     return this.sleepService.updateSleepRecord(parent.parentId, ID, updateSleepDto);
   }
 
@@ -101,11 +90,9 @@ export class SleepController {
     @CurrentUser() parent: Parent,
   ) {
     const ID = parseInt(id, 10);
-    
     if (isNaN(ID)) {
       throw new BadRequestException('Invalid ID format.');
     }
-
     return this.sleepService.deleteSleepRecord(parent.parentId, ID);
   }
 }
