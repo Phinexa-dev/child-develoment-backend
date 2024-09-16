@@ -10,6 +10,7 @@ import { ChildModule } from './child/child.module';
 import { GrowthModule } from './growth/growth.module';
 import { SleepModule } from './sleep/sleep.module';
 import { ArticleModule } from './article/article.module';
+import { NurseModule } from './feeding/nurse/nurse.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { ArticleModule } from './article/article.module';
     ChildModule,
     GrowthModule,
     SleepModule,
-   ArticleModule],
+   ArticleModule,
+   NurseModule],
   controllers: [AppController],
   providers: [AppService],
 })

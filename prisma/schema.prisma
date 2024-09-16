@@ -102,7 +102,7 @@ model OldPasswords {
 
 model Nursing {
   id            Int      @id @default(autoincrement())
-  childId       Int
+  childId       Intc
   date          DateTime
   time          DateTime
   leftDuration  Int?
