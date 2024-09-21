@@ -23,26 +23,26 @@ export class MilkTypeController {
   findOne(@Param('id') id: string) {
     const recID = parseInt(id, 10)
     if (isNaN(recID)) {
-      throw new BadRequestException('Invalid childId format.');
+      throw new BadRequestException('Invalid Type id format.');
     }
-    return this.milkTypeService.findOne(+id);
+    return this.milkTypeService.findOne(recID);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMilkTypeDto: Prisma.MilkTypeUpdateInput) {
     const recID = parseInt(id, 10)
     if (isNaN(recID)) {
-      throw new BadRequestException('Invalid childId format.');
+      throw new BadRequestException('Invalid Type id format.');
     }
-    return this.milkTypeService.update(+id, updateMilkTypeDto);
+    return this.milkTypeService.update(recID, updateMilkTypeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     const recID = parseInt(id, 10)
     if (isNaN(recID)) {
-      throw new BadRequestException('Invalid childId format.');
+      throw new BadRequestException('Invalid Type Id format.');
     }
-    return this.milkTypeService.remove(+id);
+    return this.milkTypeService.remove(recID);
   }
 }
