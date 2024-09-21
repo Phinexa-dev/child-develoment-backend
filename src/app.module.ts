@@ -11,6 +11,7 @@ import { GrowthModule } from './growth/growth.module';
 import { SleepModule } from './sleep/sleep.module';
 import { ArticleModule } from './article/article.module';
 import { NurseModule } from './feeding/nurse/nurse.module';
+import { MilkTypeModule } from './feeding/milk-type/milk-type.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { NurseModule } from './feeding/nurse/nurse.module';
     GrowthModule,
     SleepModule,
    ArticleModule,
-   NurseModule],
+   NurseModule,
+   MilkTypeModule],
   controllers: [AppController],
   providers: [AppService],
 })
