@@ -118,6 +118,20 @@ export class NurseService {
     }
   }
 
+  async getNurseRecordsBetweenDates(parentId: number, childId: number, startDate: Date, endDate: Date) {
+    await this.verifyParentChildRelation(parentId, childId);
+
+    return this.databaseService.nursing.findMany({
+      where: {
+        childId: childId,
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+    });
+  }
+
   async remove(id: number, parentId: number) {
     try {
       const nursingRecord = await this.databaseService.nursing.findUnique({
