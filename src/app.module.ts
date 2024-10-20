@@ -13,6 +13,9 @@ import { ArticleModule } from './article/article.module';
 import { NurseModule } from './feeding/nurse/nurse.module';
 import { MilkTypeModule } from './feeding/milk-type/milk-type.module';
 import { BottleModule } from './feeding/bottle/bottle.module';
+import { CategoryModule } from './feeding/category/category.module';
+import { CategoryItemModule } from './feeding/category-item/category-item.module';
+import { SolidModule } from './feeding/solid/solid.module';
 
 @Module({
   imports: [
@@ -30,7 +33,10 @@ import { BottleModule } from './feeding/bottle/bottle.module';
    ArticleModule,
    NurseModule,
    MilkTypeModule,
-   BottleModule],
+   BottleModule,
+   CategoryModule,
+   CategoryItemModule,
+   SolidModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -47,6 +47,7 @@ model Parent {
   children     ParentChild[]
   oldPasswords OldPasswords[]
   MedicineCus  MedicineCus[]
+  customSolidItems  CategoryItems[]
 }
 
 model Child {
@@ -102,7 +103,7 @@ model OldPasswords {
 
 model Nursing {
   id            Int      @id @default(autoincrement())
-  childId       Intc
+  childId       Int
   date          DateTime
   time          DateTime
   leftDuration  Int?
@@ -118,7 +119,7 @@ model Bottle {
   childId Int
   typeId  Int
   volume  Float?
-  stash   Float?
+  stash   String?
   date    DateTime
   time    DateTime
   notes   String?
@@ -168,10 +169,12 @@ model CategoryItems {
   categoryId Int
   isDefault  Boolean
   parentId   Int?
-  weight     Float?
+  isSolid    Boolean
+  itemName   String
 
   // Relations
   category  Category   @relation(fields: [categoryId], references: [categoryId])
+  parent    Parent?    @relation(fields: [parentId], references: [parentId])
   solidCats SolidCat[]
 
   @@unique([categoryId, itemId])

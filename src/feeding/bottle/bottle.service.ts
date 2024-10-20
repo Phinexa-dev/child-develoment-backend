@@ -36,13 +36,8 @@ export class BottleService {
       if (!createBottleDto.volume && !createBottleDto.stash && !createBottleDto.notes) {
         throw new BadRequestException('Bottle must contain at least one of volume, stash, or notes');
       }
-
       if (createBottleDto.volume !== undefined && (typeof createBottleDto.volume !== 'number' || isNaN(createBottleDto.volume))) {
         throw new BadRequestException('Volume must be a valid number.');
-      }
-
-      if (createBottleDto.stash !== undefined && (typeof createBottleDto.stash !== 'number' || isNaN(createBottleDto.stash))) {
-        throw new BadRequestException('Stash must be a valid number.');
       }
 
       const milkTypeExists = await this.databaseService.milkType.findUnique({
@@ -142,9 +137,6 @@ export class BottleService {
       }
       if (updateBottleDto.volume !== undefined && (typeof updateBottleDto.volume !== 'number' || isNaN(updateBottleDto.volume))) {
         throw new BadRequestException('Volume must be a valid number.');
-      }
-      if (updateBottleDto.stash !== undefined && (typeof updateBottleDto.stash !== 'number' || isNaN(updateBottleDto.stash))) {
-        throw new BadRequestException('Stash must be a valid number.');
       }
 
       if (

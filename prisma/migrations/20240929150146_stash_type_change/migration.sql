@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Bottle" ALTER COLUMN "stash" SET DATA TYPE TEXT;

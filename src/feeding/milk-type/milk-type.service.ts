@@ -62,7 +62,12 @@ export class MilkTypeService {
 
   async update(id: number, updateMilkTypeDto: Prisma.MilkTypeUpdateInput) {
     try {
-      const milkType = await this.findOne(id);
+      const milkType = await this.databaseService.milkType.findUnique({
+        where: { typeID: id },
+      });
+      if(!milkType) {
+        throw new NotFoundException();
+      }
 
       const updatedMilkType = await this.databaseService.milkType.update({
         where: { typeID: id },
@@ -77,7 +82,9 @@ export class MilkTypeService {
 
   async remove(id: number) {
     try {
-      const milkType = await this.findOne(id);
+      const milkType = await this.databaseService.milkType.findUnique({
+        where: { typeID: id },
+      });
       if (!milkType) {
         throw new NotFoundException()
       }
