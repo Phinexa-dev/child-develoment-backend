@@ -139,21 +139,20 @@ model Solids {
 
   // Relations
   child      Child      @relation(fields: [childId], references: [childId])
-  categories SolidCat[]
+  categories SolidCat[]  
 }
 
 model SolidCat {
   id    Int      @id @default(autoincrement())
   solidId      Int
-  itemId       Int    @unique
+  itemId       Int    
   weightVolume Float?
 
   // Relations
   solid        Solids         @relation(fields: [solidId], references: [solidId])
   categoryItem CategoryItems  @relation(fields: [itemId], references: [itemId])
-  SolidsAlergy SolidsAlergy[]
+  
 
- 
 }
 
 model Category {
@@ -176,6 +175,7 @@ model CategoryItems {
   category  Category   @relation(fields: [categoryId], references: [categoryId])
   parent    Parent?    @relation(fields: [parentId], references: [parentId])
   solidCats SolidCat[]
+  SolidsAlergy SolidsAlergy[]
 
   @@unique([categoryId, itemId])
 }
@@ -248,16 +248,14 @@ model MedicineCus {
 }
 
 model SolidsAlergy {
-  id    Int      @id @default(autoincrement())
-  itemId  Int
-  childId Int
-  note    String?
+  id       Int      @id @default(autoincrement())
+  itemId   Int
+  childId  Int
+  note     String?
 
   // Relations
-  solidCat SolidCat @relation(fields: [itemId], references: [itemId])
-  child    Child    @relation(fields: [childId], references: [childId])
-
-  
+  categoryItem CategoryItems @relation(fields: [itemId], references: [itemId]) // Referencing CategoryItems instead of SolidCat
+  child        Child         @relation(fields: [childId], references: [childId])
 }
 
 model MilkAlergy {

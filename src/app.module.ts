@@ -16,6 +16,7 @@ import { BottleModule } from './feeding/bottle/bottle.module';
 import { CategoryModule } from './feeding/category/category.module';
 import { CategoryItemModule } from './feeding/category-item/category-item.module';
 import { SolidModule } from './feeding/solid/solid.module';
+import { SolidcatModule } from './feeding/solidcat/solidcat.module';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { SolidModule } from './feeding/solid/solid.module';
    BottleModule,
    CategoryModule,
    CategoryItemModule,
-   SolidModule],
+   SolidModule,
+   SolidcatModule],
   controllers: [AppController],
   providers: [AppService],
 })
