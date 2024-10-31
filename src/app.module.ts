@@ -17,6 +17,8 @@ import { CategoryModule } from './feeding/category/category.module';
 import { CategoryItemModule } from './feeding/category-item/category-item.module';
 import { SolidModule } from './feeding/solid/solid.module';
 import { SolidcatModule } from './feeding/solidcat/solidcat.module';
+import { MedicineModule } from './medicineDef/medicine.module';
+import { MedicineCusModule } from './medicine-cus/medicine-cus.module';
 
 @Module({
   imports: [
@@ -38,7 +40,9 @@ import { SolidcatModule } from './feeding/solidcat/solidcat.module';
    CategoryModule,
    CategoryItemModule,
    SolidModule,
-   SolidcatModule],
+   SolidcatModule,
+   MedicineModule,
+   MedicineCusModule],
   controllers: [AppController],
   providers: [AppService],
 })
