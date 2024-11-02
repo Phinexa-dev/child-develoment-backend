@@ -19,6 +19,8 @@ import { SolidModule } from './feeding/solid/solid.module';
 import { SolidcatModule } from './feeding/solidcat/solidcat.module';
 import { MedicineModule } from './medicineDef/medicine.module';
 import { MedicineCusModule } from './medicine-cus/medicine-cus.module';
+import { MedicationModule } from './medication/medication.module';
+import { MedicationSlotModule } from './medication-slot/medication-slot.module';
 
 @Module({
   imports: [
@@ -42,7 +44,9 @@ import { MedicineCusModule } from './medicine-cus/medicine-cus.module';
    SolidModule,
    SolidcatModule,
    MedicineModule,
-   MedicineCusModule],
+   MedicineCusModule,
+   MedicationModule,
+   MedicationSlotModule],
   controllers: [AppController],
   providers: [AppService],
 })

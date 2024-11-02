@@ -196,6 +196,7 @@ model Medication {
   startingDate DateTime
   endingDate   DateTime
   frequency    String
+  isDeleted    Boolean
 
   // Relations
   child    Child            @relation(fields: [childId], references: [childId])
@@ -210,7 +211,8 @@ model MedicationSlot {
   time             DateTime?
   amount           Float
   status           String // taken/missed
-
+  isDeleted        Boolean   @default(false)
+ 
   // Relations
   medication Medication @relation(fields: [medicationId], references: [id])
 }
@@ -230,6 +232,7 @@ model MedicineDef {
   name        String
   description String
   form        String // tablet, liquid, etc.
+  isDeleted   Boolean  @default(false)
 
   // Relations
   medicine Medicine @relation(fields: [medID], references: [medID])
@@ -241,6 +244,7 @@ model MedicineCus {
   name        String
   description String
   form        String
+  isDeleted   Boolean  @default(false)
 
   // Relations
   medicine Medicine @relation(fields: [medID], references: [medID])
@@ -330,3 +334,4 @@ model Article {
   date      DateTime
   author    String
 }
+

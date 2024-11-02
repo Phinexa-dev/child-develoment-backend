@@ -15,7 +15,10 @@ export class MedicineCusService {
     }
   
     const existingMedicineDef = await this.databaseService.medicineDef.findFirst({
-      where: { name },
+      where: { 
+        name,
+        isDeleted: false
+       },
     });
     if (existingMedicineDef) {
       throw new ConflictException(`A medicine with the name "${name}" already exists in default Medicine.`);
@@ -25,12 +28,15 @@ export class MedicineCusService {
       where: {
         name,
         parentId,
+        isDeleted: false
       },
     });
     if (existingMedicineCus) {
       throw new ConflictException(`A medicine with the name "${name}" already exists for this user.`);
     }
   
+    createMedicineCusDto.isDeleted= false;
+
     return await this.databaseService.medicineCus.create({
       data: {
         ...createMedicineCusDto,
@@ -47,7 +53,8 @@ export class MedicineCusService {
   async findAll(parentId: number) {
     return await this.databaseService.medicineCus.findMany({
       where:{
-        parentId
+        parentId,
+        isDeleted: false
       }
     })
   }
@@ -56,7 +63,8 @@ export class MedicineCusService {
     const existingMed = await this.databaseService.medicineCus.findUnique({
         where:{
           medID:id,
-          parentId
+          parentId,
+          isDeleted: false
         }
     })
     if(existingMed ==null){
@@ -69,7 +77,8 @@ export class MedicineCusService {
     const existingMed = await this.databaseService.medicineCus.findUnique({
       where:{
         medID:id,
-        parentId
+        parentId,
+        isDeleted: false
       }
   })
   
@@ -86,12 +95,18 @@ export class MedicineCusService {
     const existingMed = await this.databaseService.medicineCus.findUnique({
       where:{
         medID:id,
-        parentId
+        parentId,
+        isDeleted: false
       }
   })
   if(existingMed ==null){
     throw new NotFoundException("Medicine not found");
   }
-    return this.databaseService.medicineCus.delete({where:{medID:id}})
+    return this.databaseService.medicineCus.update({
+      where:{medID:id},
+      data:{
+        isDeleted: true
+      }
+    })
   }
 }

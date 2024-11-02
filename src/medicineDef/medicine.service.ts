@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
 
@@ -16,7 +16,19 @@ export class MedicineService {
     if (!createMedicineDto.form || createMedicineDto.form.trim() === '') {
       throw new BadRequestException('Form is required and cannot be empty.');
     }
+
+    const existingMedicineDef = await this.databaseService.medicineDef.findFirst({
+      where: { 
+        name: createMedicineDto.name,
+        isDeleted: false
+       },
+    });
+    if (existingMedicineDef) {
+      throw new ConflictException(`A medicine with the name "${name}" already exists in default Medicine.`);
+    }
   
+    createMedicineDto.isDeleted= false;
+
     return await this.databaseService.medicineDef.create({
       data: {
         ...createMedicineDto,
@@ -25,13 +37,18 @@ export class MedicineService {
     });
   }
   async findAll() {
-    return await this.databaseService.medicineDef.findMany({});
+    return await this.databaseService.medicineDef.findMany({
+      where:{
+        isDeleted: false
+      }
+    });
   }
 
   async findOne(id: number) {
     var defMedicne = await this.databaseService.medicineDef.findUnique({
       where:{
-        medID:id
+        medID:id,
+        isDeleted: false
       }
     })
     if(defMedicne==null){
@@ -42,7 +59,9 @@ export class MedicineService {
 
   async update(id: number, updateMedicineDto: Prisma.MedicineDefUpdateInput) {
     const existingMedicine = await this.databaseService.medicineDef.findUnique({
-      where: { medID: id },
+      where: { medID: id,
+        isDeleted: false
+       },
     });
   
     if (!existingMedicine) {
@@ -78,23 +97,32 @@ export class MedicineService {
     ) {
       throw new BadRequestException('Form cannot be empty.');
     }
+    updateMedicineDto.isDeleted= false;
     return await this.databaseService.medicineDef.update({
-      where: { medID: id },
+      where: { medID: id,
+        isDeleted: false
+      },
       data: updateMedicineDto,
+
     });
   }
   
   async remove(id: number) {
     const existingMedicine = await this.databaseService.medicineDef.findUnique({
-      where: { medID: id },
+      where: { medID: id,
+        isDeleted: false
+       },
     });
   
     if (!existingMedicine) {
       throw new NotFoundException(`Medicine with ID ${id} not found.`);
     }
 
-    return await this.databaseService.medicineDef.delete({
+    return await this.databaseService.medicineDef.update({
       where: { medID: id },
+      data:{
+        isDeleted: true,
+      }
     });
   }
 }

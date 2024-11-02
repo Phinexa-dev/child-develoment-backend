@@ -1,7 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { MedicineCusService } from './medicine-cus.service';
-import { CreateMedicineCusDto } from './dto/create-medicine-cus.dto';
-import { UpdateMedicineCusDto } from './dto/update-medicine-cus.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { Parent, Prisma } from '@prisma/client';
