@@ -21,6 +21,7 @@ import { MedicineModule } from './medicineDef/medicine.module';
 import { MedicineCusModule } from './medicine-cus/medicine-cus.module';
 import { MedicationModule } from './medication/medication.module';
 import { MedicationSlotModule } from './medication-slot/medication-slot.module';
+import { AllergiesModule } from './allergies/allergies.module';
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import { MedicationSlotModule } from './medication-slot/medication-slot.module';
    MedicineModule,
    MedicineCusModule,
    MedicationModule,
-   MedicationSlotModule],
+   MedicationSlotModule,
+   AllergiesModule],
   controllers: [AppController],
   providers: [AppService],
 })
