@@ -1,7 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, BadRequestException } from '@nestjs/common';
 import { AllergiesService } from './allergies.service';
-import { CreateAllergyDto } from './dto/create-allergy.dto';
-import { UpdateAllergyDto } from './dto/update-allergy.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { Parent, Prisma } from '@prisma/client';
@@ -60,14 +58,16 @@ export class AllergiesController {
   @UseGuards(JwtAuthGuard)
   update(
     @Param('id') id: string,
-    @Body() updateAllergyDto: UpdateAllergyDto,
+    @Body() updateAllergyDto: Prisma.AllergiesUpdateInput,
     @CurrentUser() parent:Parent) {
     return this.allergiesService.update(+id, updateAllergyDto, parent.parentId);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: string, @CurrentUser() parent: Parent) {
+  remove(
+    @Param('id') id: string,
+    @CurrentUser() parent: Parent) {
     return this.allergiesService.remove(+id,parent.parentId);
   }
 }
