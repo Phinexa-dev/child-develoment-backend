@@ -109,6 +109,7 @@ model Nursing {
   leftDuration  Int?
   rightDuration Int?
   notes         String?
+  isDeleted     Boolean   @default(false)
 
   // Relations
   child Child @relation(fields: [childId], references: [childId])

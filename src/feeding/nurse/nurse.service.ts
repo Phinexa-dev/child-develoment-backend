@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
+import { CreateNurseDto } from './dto/create-nurse-dto';
+import { UpdateNurseDto } from './dto/update-nurse-dto';
 
 @Injectable()
 export class NurseService {
@@ -21,49 +23,46 @@ export class NurseService {
     }
   }
 
-  async create(createNurseDto: Prisma.NursingCreateInput, parentId: number) {
+  async create(createNurseDto: CreateNurseDto, parentId: number) {
     try {
-      await this.verifyParentChildRelation(parentId, createNurseDto.child.connect.childId);
+      await this.verifyParentChildRelation(parentId, createNurseDto.childId);
 
-      if (!createNurseDto.date || !createNurseDto.time) {
-        throw new BadRequestException("Time and Date should be included");
-      }
-      if (isNaN(Date.parse(createNurseDto.date.toString()))) {
-        throw new BadRequestException("Invalid date format, expected ISO-8601 DateTime");
-      }
-      if (isNaN(Date.parse(createNurseDto.time.toString()))) {
-        throw new BadRequestException("Invalid time format, expected ISO-8601 DateTime");
-      }
       if (!createNurseDto.leftDuration && !createNurseDto.rightDuration && !createNurseDto.notes) {
-        throw new BadRequestException("Body should contain at least one of left, right durations or note")
+        throw new BadRequestException(
+          "At least one of 'leftDuration', 'rightDuration', or 'notes' must be provided",
+        );
       }
+
+      const nursingData: Prisma.NursingCreateInput = {
+        date: createNurseDto.date,
+        time: createNurseDto.time,
+        leftDuration: createNurseDto.leftDuration,
+        rightDuration: createNurseDto.rightDuration,
+        notes: createNurseDto.notes,
+        child: {
+          connect: { childId: createNurseDto.childId },
+        },
+      };
 
       return this.databaseService.nursing.create({
-        data: {
-          date: createNurseDto.date,
-          time: createNurseDto.time,
-          leftDuration: createNurseDto.leftDuration,
-          rightDuration: createNurseDto.rightDuration,
-          notes: createNurseDto.notes,
-          child: {
-            connect: { childId: createNurseDto.child.connect.childId },
-          },
-        },
+        data: nursingData,
       });
     } catch (e) {
       throw new BadRequestException(e.message || e);
     }
   }
 
-  async findAll(parentId: number, childId: number) {
+  async findAll(parentId: number, childId: number, limit: number, offset: number) {
     try {
+      await this.verifyParentChildRelation(parentId, childId);
 
-      await this.verifyParentChildRelation(parentId, childId)
       return this.databaseService.nursing.findMany({
         where: {
-          childId: childId
-        }
-
+          childId: childId,
+          isDeleted: false,
+        },
+        take: limit,
+        skip: offset, 
       });
     } catch (e) {
       throw new BadRequestException(e.message || e);
@@ -75,6 +74,7 @@ export class NurseService {
       const nursingRecord = await this.databaseService.nursing.findUnique({
         where: {
           id: id,
+          isDeleted: false,
         },
       });
 
@@ -89,28 +89,25 @@ export class NurseService {
     }
   }
 
-  async update(id: number, updateNurseDto: Prisma.NursingUpdateInput, parentId: number) {
+  async update(id: number, updateNurseDto: UpdateNurseDto, parentId: number) {
     try {
       const nursingRecord = await this.databaseService.nursing.findUnique({
-        where: { id: id },
+        where: {
+          id: id,
+          isDeleted: false,
+        },
       });
 
       if (!nursingRecord) {
         throw new NotFoundException('Nursing record not found');
       }
+
       await this.verifyParentChildRelation(parentId, nursingRecord.childId);
 
       return this.databaseService.nursing.update({
         where: { id: id },
         data: {
-          date: updateNurseDto.date ?? nursingRecord.date,
-          time: updateNurseDto.time ?? nursingRecord.time,
-          leftDuration: updateNurseDto.leftDuration ?? nursingRecord.leftDuration,
-          rightDuration: updateNurseDto.rightDuration ?? nursingRecord.rightDuration,
-          notes: updateNurseDto.notes ?? nursingRecord.notes,
-          child: {
-            connect: { childId: updateNurseDto.child?.connect?.childId || nursingRecord.childId },
-          },
+          ...updateNurseDto
         },
       });
     } catch (e) {
@@ -135,7 +132,10 @@ export class NurseService {
   async remove(id: number, parentId: number) {
     try {
       const nursingRecord = await this.databaseService.nursing.findUnique({
-        where: { id: id },
+        where: {
+          id: id,
+          isDeleted: false
+        },
       });
 
       if (!nursingRecord) {
@@ -143,8 +143,9 @@ export class NurseService {
       }
       await this.verifyParentChildRelation(parentId, nursingRecord.childId);
 
-      return this.databaseService.nursing.delete({
+      return this.databaseService.nursing.update({
         where: { id: id },
+        data: { isDeleted: true }
       });
     } catch (e) {
       throw new BadRequestException(e.message || e);
