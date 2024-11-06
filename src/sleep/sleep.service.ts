@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { isDataURI } from 'class-validator';
 import { DatabaseService } from 'src/database/database.service';
 
 
 @Injectable()
 export class SleepService {
 
-constructor(private readonly databaseService : DatabaseService){}
+  constructor(private readonly databaseService: DatabaseService) { }
 
   private async verifyParentChildRelation(parentId: number, childId: number) {
     const parentChildRelation = await this.databaseService.parentChild.findFirst({
@@ -49,6 +50,7 @@ constructor(private readonly databaseService : DatabaseService){}
           gte: startDate,
           lte: endDate,
         },
+        isDeleted: false
       },
     });
   }
@@ -59,13 +61,17 @@ constructor(private readonly databaseService : DatabaseService){}
     return this.databaseService.sleep.findMany({
       where: {
         childId: childId,
+        isDeleted: false
       },
     });
   }
 
   async updateSleepRecord(parentId: number, sleepId: number, updateSleepDto: Prisma.SleepUpdateInput) {
     const sleepRecord = await this.databaseService.sleep.findUnique({
-      where: { sleepId: sleepId },
+      where: {
+        sleepId: sleepId,
+        isDeleted: false
+      },
     });
 
     if (!sleepRecord) {
@@ -73,7 +79,7 @@ constructor(private readonly databaseService : DatabaseService){}
     }
 
     await this.verifyParentChildRelation(parentId, sleepRecord.childId);
-
+    updateSleepDto.isDeleted = false;
     return this.databaseService.sleep.update({
       where: { sleepId: sleepId },
       data: updateSleepDto,
@@ -82,7 +88,10 @@ constructor(private readonly databaseService : DatabaseService){}
 
   async deleteSleepRecord(parentId: number, sleepId: number) {
     const sleepRecord = await this.databaseService.sleep.findUnique({
-      where: { sleepId: sleepId },
+      where: {
+        sleepId: sleepId,
+        isDeleted: false
+      },
     });
 
     if (!sleepRecord) {
@@ -90,8 +99,9 @@ constructor(private readonly databaseService : DatabaseService){}
     }
     await this.verifyParentChildRelation(parentId, sleepRecord.childId);
 
-    return this.databaseService.sleep.delete({
+    return this.databaseService.sleep.update({
       where: { sleepId: sleepId },
+      data: { isDeleted: true }
     });
   }
 }

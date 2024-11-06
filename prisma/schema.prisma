@@ -322,6 +322,7 @@ model Sleep {
   duration   Int // Duration in minutes 
   note       String?
   sleepStyle String?
+  isDeleted Boolean @default(false)
 
   // Relations
   child Child @relation(fields: [childId], references: [childId])

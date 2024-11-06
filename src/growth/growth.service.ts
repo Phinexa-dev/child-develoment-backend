@@ -59,7 +59,6 @@ export class GrowthService {
         childId: childId,
         isDeleted: false
       }
-
     });
   }
 
