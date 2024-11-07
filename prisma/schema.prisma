@@ -124,6 +124,7 @@ model Bottle {
   date    DateTime
   time    DateTime
   notes   String?
+  isDeleted     Boolean   @default(false)
 
   // Relations
   child    Child    @relation(fields: [childId], references: [childId])
@@ -137,6 +138,7 @@ model Solids {
   note     String?
   date     DateTime
   time     DateTime
+  isDeleted     Boolean   @default(false)
 
   // Relations
   child      Child      @relation(fields: [childId], references: [childId])
@@ -148,6 +150,7 @@ model SolidCat {
   solidId      Int
   itemId       Int    
   weightVolume Float?
+   isDeleted     Boolean   @default(false)
 
   // Relations
   solid        Solids         @relation(fields: [solidId], references: [solidId])
@@ -171,6 +174,7 @@ model CategoryItems {
   parentId   Int?
   isSolid    Boolean
   itemName   String
+  isDeleted  Boolean @default(false)
 
   // Relations
   category  Category   @relation(fields: [categoryId], references: [categoryId])
@@ -184,6 +188,7 @@ model CategoryItems {
 model MilkType {
   typeID   Int    @id @default(autoincrement())
   milkType String
+  isDeleted     Boolean   @default(false)
 
   // Relations
   bottles    Bottle[]

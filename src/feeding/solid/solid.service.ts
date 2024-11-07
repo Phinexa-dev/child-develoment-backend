@@ -33,7 +33,7 @@ export class SolidService {
         const itemId = category.categoryItem.connect.itemId;
 
         const categoryItemExists = await this.databaseService.categoryItems.findUnique({
-          where: { itemId },
+          where: { itemId, isDeleted: false },
         });
 
         if (!categoryItemExists) {
@@ -54,6 +54,7 @@ export class SolidService {
     return this.databaseService.solids.findMany({
       where: {
         childId: childId,
+        isDeleted: false,
       },
       include: {
         categories: {
@@ -71,7 +72,10 @@ export class SolidService {
 
   async findOne(parentId: number, solidId: number) {
     const solid = await this.databaseService.solids.findUnique({
-      where: { solidId: solidId },
+      where: {
+        solidId: solidId,
+        isDeleted: false
+      },
       include: {
         child: true,
         categories: {
@@ -105,15 +109,15 @@ export class SolidService {
   }
 
   async getSolidRecordsBetweenDates(parentId: number, childId: number, startDate: Date, endDate: Date) {
-   
+
     await this.verifyParentChildRelation(parentId, childId);
 
     return this.databaseService.solids.findMany({
       where: {
         childId: childId,
         date: {
-          gte: startDate, 
-          lte: endDate,  
+          gte: startDate,
+          lte: endDate,
         },
       },
       include: {
@@ -130,10 +134,13 @@ export class SolidService {
       },
     });
   }
-  
+
   async update(id: number, parentId: number, updateSolidDto: Prisma.SolidsUpdateInput) {
     const solid = await this.databaseService.solids.findUnique({
-      where: { solidId: id },
+      where: {
+        solidId: id,
+        isDeleted: false
+      },
     });
 
     if (!solid) {
@@ -160,7 +167,10 @@ export class SolidService {
   async remove(id: number, parentId: number) {
 
     const solid = await this.databaseService.solids.findUnique({
-      where: { solidId: id },
+      where: {
+        solidId: id,
+        isDeleted: false
+      },
     });
 
     if (!solid) {
@@ -179,12 +189,14 @@ export class SolidService {
       throw new UnauthorizedException(`This solid does not belong to the authenticated parent's child.`);
     }
 
-    await this.databaseService.solidCat.deleteMany({
+    await this.databaseService.solidCat.updateMany({
       where: { solidId: id },
+      data: { isDeleted: false }
     });
 
-    return this.databaseService.solids.delete({
+    return this.databaseService.solids.update({
       where: { solidId: id },
+      data: { isDeleted: false }
     });
   }
 

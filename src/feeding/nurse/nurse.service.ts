@@ -62,7 +62,8 @@ export class NurseService {
           isDeleted: false,
         },
         take: limit,
-        skip: offset, 
+        skip: offset,
+        orderBy: { date: 'desc' }
       });
     } catch (e) {
       throw new BadRequestException(e.message || e);

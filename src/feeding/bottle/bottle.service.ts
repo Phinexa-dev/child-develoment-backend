@@ -41,7 +41,10 @@ export class BottleService {
       }
 
       const milkTypeExists = await this.databaseService.milkType.findUnique({
-        where: { typeID: createBottleDto.milkType.connect.typeID },
+        where: {
+          typeID: createBottleDto.milkType.connect.typeID,
+          isDeleted: false
+        },
       });
 
       if (!milkTypeExists) {
@@ -75,6 +78,7 @@ export class BottleService {
       return this.databaseService.bottle.findMany({
         where: {
           childId: childId,
+          isDeleted: false,
         },
         include: {
           milkType: true,
@@ -90,6 +94,7 @@ export class BottleService {
       const bottleRecord = await this.databaseService.bottle.findUnique({
         where: {
           id: id,
+          isDeleted: false,
         },
         include: {
           milkType: true,
@@ -112,7 +117,10 @@ export class BottleService {
     try {
 
       const bottleRecord = await this.databaseService.bottle.findUnique({
-        where: { id: id },
+        where: {
+          id,
+          isDeleted: false
+        },
       });
 
       if (!bottleRecord) {
@@ -184,7 +192,10 @@ export class BottleService {
   async remove(id: number, parentId: number) {
     try {
       const bottleRecord = await this.databaseService.bottle.findUnique({
-        where: { id: id },
+        where: {
+          id,
+          isDeleted: false
+        },
       });
 
       if (!bottleRecord) {
@@ -193,8 +204,9 @@ export class BottleService {
 
       await this.verifyParentChildRelation(parentId, bottleRecord.childId);
 
-      return this.databaseService.bottle.delete({
-        where: { id: id },
+      return this.databaseService.bottle.update({
+        where: { id },
+        data: { isDeleted: true }
       });
     } catch (e) {
       throw new BadRequestException(e.message || e);
