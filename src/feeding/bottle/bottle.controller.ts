@@ -4,46 +4,46 @@ import { Parent, Prisma } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { isValid, parseISO } from 'date-fns';
+import { CreateBottleDto } from './dto/create-bottle-dto';
+import { UpdateBottleDto } from './dto/update-bottle-dto';
 
 @Controller('bottle')
 export class BottleController {
   constructor(private readonly bottleService: BottleService) { }
 
-  @Post('child/:childId')
+  @Post('')
   @UseGuards(JwtAuthGuard)
   create(
-    @Body() createBottleDto: Prisma.BottleCreateInput,
+    @Body() createBottleDto: CreateBottleDto,
     @CurrentUser() parent: Parent,
-    @Param('childId') childId: string
   ) {
-    const childIdNumber = parseInt(childId, 10);
-
-    if (isNaN(childIdNumber)) {
-      throw new BadRequestException('Invalid childId format.');
-    }
-    if (!createBottleDto.child) {
-      createBottleDto.child = {
-        connect: { childId: childIdNumber },
-      };
-    } else {
-      createBottleDto.child.connect = { childId: childIdNumber };
-    }
-
     return this.bottleService.create(createBottleDto, parent.parentId);
   }
 
-  @Get('child/:childId')
+  @Get(':childId')
   @UseGuards(JwtAuthGuard)
   findAll(
     @CurrentUser() parent: Parent,
-    @Param('childId') childId: string
+    @Param('childId') childId: string,
+    @Query('limit') limit: string = '10', // Default limit
+    @Query('offset') offset: string = '0' // Default offset
   ) {
     const childIdNumber = parseInt(childId, 10);
 
     if (isNaN(childIdNumber)) {
       throw new BadRequestException('Invalid childId format.');
     }
-    return this.bottleService.findAll(parent.parentId, childIdNumber);
+    const limitNum = parseInt(limit, 10);
+    const offsetNum = parseInt(offset, 10);
+
+    if (isNaN(limitNum) || limitNum <= 0) {
+      throw new BadRequestException('Limit must be a positive integer.');
+    }
+
+    if (isNaN(offsetNum) || offsetNum < 0) {
+      throw new BadRequestException('Offset must be a non-negative integer.');
+    }
+    return this.bottleService.findAll(parent.parentId, childIdNumber, limitNum, offsetNum);
   }
 
   @Get(':id')
@@ -88,7 +88,7 @@ export class BottleController {
   @UseGuards(JwtAuthGuard)
   update(
     @Param('id') id: string,
-    @Body() updateBottleDto: Prisma.BottleUpdateInput,
+    @Body() updateBottleDto: UpdateBottleDto,
     @CurrentUser() parent: Parent
   ) {
     const recID = parseInt(id, 10)

@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
+import { CreateBottleDto } from './dto/create-bottle-dto';
+import { UpdateBottleDto } from './dto/update-bottle-dto';
 
 @Injectable()
 export class BottleService {
@@ -20,29 +22,13 @@ export class BottleService {
     }
   }
 
-  async create(createBottleDto: Prisma.BottleCreateInput, parentId: number) {
+  async create(createBottleDto: CreateBottleDto, parentId: number) {
     try {
-      await this.verifyParentChildRelation(parentId, createBottleDto.child.connect.childId);
-
-      if (!createBottleDto.date || !createBottleDto.time) {
-        throw new BadRequestException('Date and Time must be provided');
-      }
-      if (isNaN(Date.parse(createBottleDto.date.toString()))) {
-        throw new BadRequestException('Invalid date format, expected ISO-8601 DateTime');
-      }
-      if (isNaN(Date.parse(createBottleDto.time.toString()))) {
-        throw new BadRequestException('Invalid time format, expected ISO-8601 DateTime');
-      }
-      if (!createBottleDto.volume && !createBottleDto.stash && !createBottleDto.notes) {
-        throw new BadRequestException('Bottle must contain at least one of volume, stash, or notes');
-      }
-      if (createBottleDto.volume !== undefined && (typeof createBottleDto.volume !== 'number' || isNaN(createBottleDto.volume))) {
-        throw new BadRequestException('Volume must be a valid number.');
-      }
+      await this.verifyParentChildRelation(parentId, createBottleDto.childId);
 
       const milkTypeExists = await this.databaseService.milkType.findUnique({
         where: {
-          typeID: createBottleDto.milkType.connect.typeID,
+          typeID: createBottleDto.milkTypeId,
           isDeleted: false
         },
       });
@@ -59,10 +45,10 @@ export class BottleService {
           stash: createBottleDto.stash,
           notes: createBottleDto.notes,
           child: {
-            connect: { childId: createBottleDto.child.connect.childId },
+            connect: { childId: createBottleDto.childId },
           },
           milkType: {
-            connect: { typeID: createBottleDto.milkType.connect.typeID },
+            connect: { typeID: createBottleDto.milkTypeId },
           },
         },
       });
@@ -71,7 +57,7 @@ export class BottleService {
     }
   }
 
-  async findAll(parentId: number, childId: number) {
+  async findAll(parentId: number, childId: number, limit: number, offset: number) {
     try {
       await this.verifyParentChildRelation(parentId, childId);
 
@@ -80,9 +66,22 @@ export class BottleService {
           childId: childId,
           isDeleted: false,
         },
-        include: {
-          milkType: true,
+        select: {
+          id: true,
+          childId: true,
+          typeId: true,
+          volume: true,
+          stash: true,
+          date: true,
+          time: true,
+          notes: true
         },
+        take: limit,
+        skip: offset,
+        orderBy: {
+          date: 'desc'
+        }
+
       });
     } catch (e) {
       throw new BadRequestException(e.message || e);
@@ -113,7 +112,7 @@ export class BottleService {
     }
   }
 
-  async update(id: number, updateBottleDto: Prisma.BottleUpdateInput, parentId: number) {
+  async update(id: number, updateBottleDto: UpdateBottleDto, parentId: number) {
     try {
 
       const bottleRecord = await this.databaseService.bottle.findUnique({
@@ -129,34 +128,20 @@ export class BottleService {
 
       await this.verifyParentChildRelation(parentId, bottleRecord.childId);
 
-      if (updateBottleDto.date && isNaN(Date.parse(updateBottleDto.date.toString()))) {
-        throw new BadRequestException('Invalid date format, expected ISO-8601 DateTime');
-      }
-      if (updateBottleDto.time && isNaN(Date.parse(updateBottleDto.time.toString()))) {
-        throw new BadRequestException('Invalid time format, expected ISO-8601 DateTime');
-      }
-      if (updateBottleDto.milkType?.connect?.typeID) {
+      if (updateBottleDto.milkTypeId) {
         const milkTypeExists = await this.databaseService.milkType.findUnique({
-          where: { typeID: updateBottleDto.milkType.connect.typeID },
+          where: { 
+            typeID: updateBottleDto.milkTypeId,
+            isDeleted:false
+           },
         });
         if (!milkTypeExists) {
           throw new BadRequestException('Invalid milkType: Milk type does not exist.');
         }
       }
-      if (updateBottleDto.volume !== undefined && (typeof updateBottleDto.volume !== 'number' || isNaN(updateBottleDto.volume))) {
-        throw new BadRequestException('Volume must be a valid number.');
-      }
-
-      if (
-        updateBottleDto.volume === null &&
-        updateBottleDto.stash === null &&
-        updateBottleDto.notes === null
-      ) {
-        throw new BadRequestException('Bottle must contain at least one of volume, stash, or notes');
-      }
-
+      
       return this.databaseService.bottle.update({
-        where: { id: id },
+        where: { id },
         data: {
           date: updateBottleDto.date ?? bottleRecord.date,
           time: updateBottleDto.time ?? bottleRecord.time,
@@ -164,7 +149,7 @@ export class BottleService {
           stash: updateBottleDto.stash ?? bottleRecord.stash,
           notes: updateBottleDto.notes ?? bottleRecord.notes,
           milkType: {
-            connect: { typeID: updateBottleDto.milkType?.connect?.typeID || bottleRecord.typeId },
+            connect: { typeID: updateBottleDto.milkTypeId || bottleRecord.typeId },
           },
         },
       });

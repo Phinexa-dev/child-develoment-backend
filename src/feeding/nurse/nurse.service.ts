@@ -61,6 +61,15 @@ export class NurseService {
           childId: childId,
           isDeleted: false,
         },
+        select:{
+          id:true,
+          childId:true,
+          date:true,
+          time:true,
+          leftDuration:true,
+          rightDuration:true,
+          notes:true,
+        },
         take: limit,
         skip: offset,
         orderBy: { date: 'desc' }
