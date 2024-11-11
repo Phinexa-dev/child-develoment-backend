@@ -10,6 +10,13 @@ import { ChildModule } from './child/child.module';
 import { GrowthModule } from './growth/growth.module';
 import { SleepModule } from './sleep/sleep.module';
 import { ArticleModule } from './article/article.module';
+import { NurseModule } from './feeding/nurse/nurse.module';
+import { MilkTypeModule } from './feeding/milk-type/milk-type.module';
+import { BottleModule } from './feeding/bottle/bottle.module';
+import { CategoryModule } from './feeding/category/category.module';
+import { CategoryItemModule } from './feeding/category-item/category-item.module';
+import { SolidModule } from './feeding/solid/solid.module';
+import { SolidcatModule } from './feeding/solidcat/solidcat.module';
 
 @Module({
   imports: [
@@ -24,7 +31,14 @@ import { ArticleModule } from './article/article.module';
     ChildModule,
     GrowthModule,
     SleepModule,
-   ArticleModule],
+   ArticleModule,
+   NurseModule,
+   MilkTypeModule,
+   BottleModule,
+   CategoryModule,
+   CategoryItemModule,
+   SolidModule,
+   SolidcatModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -47,6 +47,7 @@ model Parent {
   children     ParentChild[]
   oldPasswords OldPasswords[]
   MedicineCus  MedicineCus[]
+  customSolidItems  CategoryItems[]
 }
 
 model Child {
@@ -108,6 +109,7 @@ model Nursing {
   leftDuration  Int?
   rightDuration Int?
   notes         String?
+  isDeleted     Boolean   @default(false)
 
   // Relations
   child Child @relation(fields: [childId], references: [childId])
@@ -118,10 +120,11 @@ model Bottle {
   childId Int
   typeId  Int
   volume  Float?
-  stash   Float?
+  stash   String?
   date    DateTime
   time    DateTime
   notes   String?
+  isDeleted     Boolean   @default(false)
 
   // Relations
   child    Child    @relation(fields: [childId], references: [childId])
@@ -135,24 +138,25 @@ model Solids {
   note     String?
   date     DateTime
   time     DateTime
+  isDeleted     Boolean   @default(false)
 
   // Relations
   child      Child      @relation(fields: [childId], references: [childId])
-  categories SolidCat[]
+  categories SolidCat[]  
 }
 
 model SolidCat {
   id    Int      @id @default(autoincrement())
   solidId      Int
-  itemId       Int    @unique
+  itemId       Int    
   weightVolume Float?
+   isDeleted     Boolean   @default(false)
 
   // Relations
   solid        Solids         @relation(fields: [solidId], references: [solidId])
   categoryItem CategoryItems  @relation(fields: [itemId], references: [itemId])
-  SolidsAlergy SolidsAlergy[]
+  
 
- 
 }
 
 model Category {
@@ -168,11 +172,15 @@ model CategoryItems {
   categoryId Int
   isDefault  Boolean
   parentId   Int?
-  weight     Float?
+  isSolid    Boolean
+  itemName   String
+  isDeleted  Boolean @default(false)
 
   // Relations
   category  Category   @relation(fields: [categoryId], references: [categoryId])
+  parent    Parent?    @relation(fields: [parentId], references: [parentId])
   solidCats SolidCat[]
+  SolidsAlergy SolidsAlergy[]
 
   @@unique([categoryId, itemId])
 }
@@ -180,6 +188,7 @@ model CategoryItems {
 model MilkType {
   typeID   Int    @id @default(autoincrement())
   milkType String
+  isDeleted     Boolean   @default(false)
 
   // Relations
   bottles    Bottle[]
@@ -245,16 +254,14 @@ model MedicineCus {
 }
 
 model SolidsAlergy {
-  id    Int      @id @default(autoincrement())
-  itemId  Int
-  childId Int
-  note    String?
+  id       Int      @id @default(autoincrement())
+  itemId   Int
+  childId  Int
+  note     String?
 
   // Relations
-  solidCat SolidCat @relation(fields: [itemId], references: [itemId])
-  child    Child    @relation(fields: [childId], references: [childId])
-
-  
+  categoryItem CategoryItems @relation(fields: [itemId], references: [itemId]) // Referencing CategoryItems instead of SolidCat
+  child        Child         @relation(fields: [childId], references: [childId])
 }
 
 model MilkAlergy {
