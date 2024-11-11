@@ -17,6 +17,7 @@ export class MilkTypeService {
             equals: createMilkTypeDto.milkType,
             mode: 'insensitive',
           },
+          isDeleted: false,
         },
       });
       if (existingMilkType.length != 0) {
@@ -34,20 +35,25 @@ export class MilkTypeService {
 
   async findAll() {
     try {
-      const milkTypes = await this.databaseService.milkType.findMany();
+      const milkTypes = await this.databaseService.milkType.findMany({
+        where: { isDeleted: false }
+      });
       if (!milkTypes.length) {
         throw new NotFoundException('No milk types found');
       }
       return milkTypes;
     } catch (error) {
-      throw(error);
+      throw (error);
     }
   }
 
   async findOne(id: number) {
     try {
       const milkType = await this.databaseService.milkType.findUnique({
-        where: { typeID: id },
+        where: {
+          typeID: id,
+          isDeleted: false
+        }
       });
 
       if (!milkType) {
@@ -56,16 +62,19 @@ export class MilkTypeService {
 
       return milkType;
     } catch (error) {
-      throw(error);
+      throw (error);
     }
   }
 
   async update(id: number, updateMilkTypeDto: Prisma.MilkTypeUpdateInput) {
     try {
       const milkType = await this.databaseService.milkType.findUnique({
-        where: { typeID: id },
+        where: {
+          typeID: id,
+          isDeleted: false
+        },
       });
-      if(!milkType) {
+      if (!milkType) {
         throw new NotFoundException();
       }
 
@@ -76,25 +85,29 @@ export class MilkTypeService {
 
       return updatedMilkType;
     } catch (error) {
-      throw(error);
+      throw (error);
     }
   }
 
   async remove(id: number) {
     try {
       const milkType = await this.databaseService.milkType.findUnique({
-        where: { typeID: id },
+        where: {
+          typeID: id,
+          isDeleted: false
+        },
       });
       if (!milkType) {
         throw new NotFoundException()
       }
-      const deletedMilkType = await this.databaseService.milkType.delete({
+      const deletedMilkType = await this.databaseService.milkType.update({
         where: { typeID: id },
+        data: { isDeleted: true }
       });
 
       return deletedMilkType;
     } catch (error) {
-      throw(error);
+      throw (error);
     }
   }
 }

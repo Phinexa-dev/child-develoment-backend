@@ -21,6 +21,8 @@ export class CategoryItemService {
         where: {
           categoryId: createCategoryItemDto.category.connect.categoryId,
           itemName: { equals: createCategoryItemDto.itemName, mode: 'insensitive' },
+          parentId,
+          isDeleted: false
         },
       });
 
@@ -51,6 +53,7 @@ export class CategoryItemService {
           { isDefault: true },
           { parentId: parentID },
         ],
+        isDeleted: false
       },
       include: {
         category: true,
@@ -66,6 +69,7 @@ export class CategoryItemService {
           { isDefault: true },
           { parentId: parentID },
         ],
+        isDeleted: false
       },
       include: {
         category: true,
@@ -80,7 +84,10 @@ export class CategoryItemService {
 
   async update(id: number, parentID: number, updateCategoryItemDto: Prisma.CategoryItemsUpdateInput) {
     const categoryItem = await this.databaseService.categoryItems.findUnique({
-      where: { itemId: id },
+      where: {
+        itemId: id,
+        isDefault: false
+      },
     });
     if (!categoryItem) {
       throw new NotFoundException(`CategoryItem with id ${id} not found.`);
@@ -88,7 +95,7 @@ export class CategoryItemService {
     if (categoryItem.isDefault) {
       throw new BadRequestException(`Default category items cannot be updated.`);
     }
-    if(!categoryItem.isDefault &&  updateCategoryItemDto.isDefault){
+    if (!categoryItem.isDefault && updateCategoryItemDto.isDefault) {
       throw new BadRequestException();
     }
     if (categoryItem.parentId !== parentID) {
@@ -102,9 +109,13 @@ export class CategoryItemService {
     });
   }
 
-  async remove(id: number, parentID: number) {
+  async remove(id: number, parentId: number) {
     const categoryItem = await this.databaseService.categoryItems.findUnique({
-      where: { itemId: id },
+      where: {
+        itemId: id,
+        isDeleted: false,
+        parentId
+      },
     });
     if (!categoryItem) {
       throw new NotFoundException(`CategoryItem with id ${id} not found.`);
@@ -112,11 +123,9 @@ export class CategoryItemService {
     if (categoryItem.isDefault) {
       throw new BadRequestException(`Default category items cannot be deleted.`);
     }
-    if (categoryItem.parentId !== parentID) {
-      throw new UnauthorizedException(`You are not authorized to delete this category item.`);
-    }
-    return this.databaseService.categoryItems.delete({
+    return this.databaseService.categoryItems.update({
       where: { itemId: id },
+      data: { isDeleted: false }
     });
   }
 }
