@@ -4,41 +4,46 @@ import { Parent, Prisma } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { isValid, parseISO } from 'date-fns';
+import { CreateSolidDto } from './dto/create-solid-dto';
+import { UpdateSolidDto } from './dto/update-solid-dto';
 
 @Controller('solid')
 export class SolidController {
   constructor(private readonly solidService: SolidService) { }
 
-  @Post('child/:childId')
+  @Post('')
   @UseGuards(JwtAuthGuard)
-  create(@Body() createSolidDto: Prisma.SolidsCreateInput,
+  create(
+    @Body() createSolidDto: CreateSolidDto,
     @CurrentUser() parent: Parent,
-    @Param('childId') childId: string) {
-    const childIdNumber = parseInt(childId, 10);
-
-    if (isNaN(childIdNumber)) {
-      throw new BadRequestException('Invalid childId format.');
-    }
-    if (!createSolidDto.child) {
-      createSolidDto.child = {
-        connect: { childId: childIdNumber },
-      };
-    } else {
-      createSolidDto.child.connect = { childId: childIdNumber };
-    }
+  ) {
     return this.solidService.create(createSolidDto, parent.parentId);
   }
 
-  @Get('child/:childId')
+  @Get(':childId')
   @UseGuards(JwtAuthGuard)
-  findAll(@CurrentUser() parent: Parent,
-    @Param('childId') childId: string) {
+  findAll(
+    @CurrentUser() parent: Parent,
+    @Param('childId') childId: string,
+    @Query('limit') limit: string = '10', // Default limit
+    @Query('offset') offset: string = '0' // Default offset
+  ) {
     const childIdNumber = parseInt(childId, 10);
 
     if (isNaN(childIdNumber)) {
       throw new BadRequestException('Invalid childId format.');
     }
-    return this.solidService.findAll(parent.parentId, childIdNumber);
+    const limitNum = parseInt(limit, 10);
+    const offsetNum = parseInt(offset, 10);
+
+    if (isNaN(limitNum) || limitNum <= 0) {
+      throw new BadRequestException('Limit must be a positive integer.');
+    }
+
+    if (isNaN(offsetNum) || offsetNum < 0) {
+      throw new BadRequestException('Offset must be a non-negative integer.');
+    }
+    return this.solidService.findAll(parent.parentId, childIdNumber, limitNum, offsetNum);
   }
 
   @Get(':id')
@@ -78,8 +83,9 @@ export class SolidController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(@Param('id') id: string,
-    @Body() updateSolidDto: Prisma.SolidsUpdateInput,
+  update(
+    @Param('id') id: string,
+    @Body() updateSolidDto: UpdateSolidDto,
     @CurrentUser() parent: Parent) {
     return this.solidService.update(+id, parent.parentId, updateSolidDto);
   }

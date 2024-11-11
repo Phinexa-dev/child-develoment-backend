@@ -1,6 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
+import { CreateSolidDto } from './dto/create-solid-dto';
+import { off } from 'process';
+import { UpdateSolidDto } from './dto/update-solid-dto';
 
 @Injectable()
 export class SolidService {
@@ -21,40 +24,63 @@ export class SolidService {
     }
   }
 
-  async create(createSolidDto: Prisma.SolidsCreateInput, parentId: number) {
-    await this.verifyParentChildRelation(parentId, createSolidDto.child.connect.childId);
+  async create(createSolidDto: CreateSolidDto, parentId: number) {
+    await this.verifyParentChildRelation(parentId, createSolidDto.childId);
 
-    const categoriesToCreate = Array.isArray(createSolidDto.categories.create)
-      ? createSolidDto.categories.create
-      : [createSolidDto.categories.create];
-
-    for (const category of categoriesToCreate) {
-      if ('categoryItem' in category && category.categoryItem) {
-        const itemId = category.categoryItem.connect.itemId;
-
-        const categoryItemExists = await this.databaseService.categoryItems.findUnique({
-          where: { itemId, isDeleted: false },
+    if (createSolidDto.categories) {
+      for (const category of createSolidDto.categories) {
+        const itemId = category.itemId;
+        const categoryItemExists = await this.databaseService.categoryItems.findFirst({
+          where: {
+            itemId,
+            isDeleted: false,
+            AND: [
+              {
+                OR: [
+                  { isDefault: true },
+                  { parentId: parentId },
+                ],
+              },
+            ],
+          },
         });
 
         if (!categoryItemExists) {
           throw new NotFoundException(`CategoryItem with itemId ${itemId} does not exist.`);
         }
-      } else {
-        throw new BadRequestException(`Missing categoryItem in the provided data.`);
       }
     }
-
+    const solidData: Prisma.SolidsCreateInput = {
+      reaction: createSolidDto.reaction,
+      note: createSolidDto.note,
+      date: createSolidDto.date,
+      time: createSolidDto.time,
+      child: {
+        connect: { childId: createSolidDto.childId },
+      },
+      categories: createSolidDto.categories
+        ? {
+          create: createSolidDto.categories.map(category => ({
+            weightVolume: category.weightVolume,
+            categoryItem: {
+              connect: { itemId: category.itemId },
+            },
+          })),
+        }
+        : undefined,
+    };
     return this.databaseService.solids.create({
-      data: createSolidDto,
+      data: solidData,
     });
   }
 
-  async findAll(parentId: number, childId: number) {
+  async findAll(parentId: number, childId: number, limit: number, offset: number) {
     await this.verifyParentChildRelation(parentId, childId);
     return this.databaseService.solids.findMany({
       where: {
         childId: childId,
         isDeleted: false,
+
       },
       include: {
         categories: {
@@ -67,6 +93,11 @@ export class SolidService {
           },
         },
       },
+      take: limit,
+      skip: offset,
+      orderBy: {
+        date: 'desc'
+      }
     });
   }
 
@@ -135,7 +166,7 @@ export class SolidService {
     });
   }
 
-  async update(id: number, parentId: number, updateSolidDto: Prisma.SolidsUpdateInput) {
+  async update(id: number, parentId: number, updateSolidDto: UpdateSolidDto) {
     const solid = await this.databaseService.solids.findUnique({
       where: {
         solidId: id,
