@@ -73,6 +73,7 @@ model Child {
   OtherAlergy    OtherAlergy[]
   Growth         Growth[]
   Sleep          Sleep[]
+  Vaccination    Vaccination[]
 }
 
 model ParentChild {
@@ -196,7 +197,7 @@ model Medication {
   startingDate DateTime
   endingDate   DateTime
   frequency    String
-  isDeleted    Boolean
+  isDeleted    Boolean   @default(false)
 
   // Relations
   child    Child            @relation(fields: [childId], references: [childId])
@@ -335,3 +336,40 @@ model Article {
   author    String
 }
 
+model Vaccine {
+  id        Int      @id @default(autoincrement())
+  name      String
+  region    String
+  notes     String?  //importance
+  ageInMonths Int
+  whereTo   String?
+  status    String
+}
+
+model Vaccination {
+  id        Int      @id @default(autoincrement())
+  childId   Int
+  date      DateTime
+  venue     String
+  notes     String?
+  isDeleted Boolean @default(false)
+  symptoms postSymptoms[]
+
+  // Relations
+  child Child @relation(fields: [childId], references: [childId])
+}
+
+model Symptom {
+  id        Int      @id @default(autoincrement())
+  name      String
+  postSymptoms postSymptoms[]
+}
+
+model postSymptoms {
+  id        Int      @id @default(autoincrement())
+  vaccinationId Int
+  symptomId  Int
+
+  vaccination    Vaccination @relation(fields: [vaccinationId], references: [id])
+  symptom        Symptom     @relation(fields: [symptomId], references: [id])
+}
