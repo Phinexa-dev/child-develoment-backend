@@ -4,54 +4,54 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { Parent, Prisma } from '@prisma/client';
 import { isValid, parseISO } from 'date-fns';
+import { CreateNurseDto } from './dto/create-nurse-dto';
+import { UpdateNurseDto } from './dto/update-nurse-dto';
 
 @Controller('nurse')
 export class NurseController {
   constructor(private readonly nurseService: NurseService) { }
 
-  @Post('child/:childId')
+  @Post()
   @UseGuards(JwtAuthGuard)
-  create(@Body() createNurseDto: Prisma.NursingCreateInput,
+  create(
+    @Body() createNurseDto: CreateNurseDto,
     @CurrentUser() parent: Parent,
-    @Param('childId') childId: string,) {
-    const childIdNumber = parseInt(childId, 10);
-
-    if (isNaN(childIdNumber)) {
-      throw new BadRequestException('Invalid childId format.');
-    }
-
-    if (!createNurseDto.child) {
-      createNurseDto.child = {
-        connect: { childId: childIdNumber },
-      };
-    } else {
-      createNurseDto.child.connect = { childId: childIdNumber };
-    }
+  ) {
     return this.nurseService.create(createNurseDto, parent.parentId);
   }
 
-  @Get("child/:childId")
+  @Get(':childId')
   @UseGuards(JwtAuthGuard)
   findAll(
     @Param('childId') childId: string,
-    @CurrentUser() parent: Parent
+    @CurrentUser() parent: Parent,
+    @Query('limit') limit: string = '10', // Default limit
+    @Query('offset') offset: string = '0' // Default offset
   ) {
-    const childID = parseInt(childId, 10)
+    const childID = parseInt(childId, 10);
     if (isNaN(childID)) {
       throw new BadRequestException('Invalid childId format.');
     }
-    return this.nurseService.findAll(parent.parentId, childID)
+
+    const limitNum = parseInt(limit, 10);
+    const offsetNum = parseInt(offset, 10);
+
+    if (isNaN(limitNum) || limitNum <= 0) {
+      throw new BadRequestException('Limit must be a positive integer.');
+    }
+
+    if (isNaN(offsetNum) || offsetNum < 0) {
+      throw new BadRequestException('Offset must be a non-negative integer.');
+    }
+
+    return this.nurseService.findAll(parent.parentId, childID, limitNum, offsetNum);
   }
 
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string,
     @CurrentUser() parent: Parent) {
-    const recID = parseInt(id, 10)
-    if (isNaN(recID)) {
-      throw new BadRequestException('Invalid childId format.');
-    }
-    return this.nurseService.findOne(recID, parent.parentId);
+    return this.nurseService.findOne(+id, parent.parentId);
   }
 
   @Get('child/:childId/date-range')
@@ -81,24 +81,19 @@ export class NurseController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(@Param('id') id: string,
-    @Body() updateNurseDto: Prisma.NursingUpdateInput,
+  update(
+    @Param('id') id: string,
+    @Body() updateNurseDto: UpdateNurseDto,
     @CurrentUser() parent: Parent) {
-    const recID = parseInt(id, 10)
-    if (isNaN(recID)) {
-      throw new BadRequestException('Invalid childId format.');
-    }
-    return this.nurseService.update(recID, updateNurseDto, parent.parentId);
+
+    return this.nurseService.update(+id, updateNurseDto, parent.parentId);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: string,
+  remove(
+    @Param('id') id: string,
     @CurrentUser() parent: Parent) {
-    const recID = parseInt(id, 10)
-    if (isNaN(recID)) {
-      throw new BadRequestException('Invalid childId format.');
-    }
-    return this.nurseService.remove(recID, parent.parentId);
+    return this.nurseService.remove(+id, parent.parentId);
   }
 }
