@@ -7,7 +7,7 @@ import { isValid, parseISO } from 'date-fns';
 import { CreateBottleDto } from './dto/create-bottle-dto';
 import { UpdateBottleDto } from './dto/update-bottle-dto';
 
-@Controller('bottle')
+@Controller('feeding/bottle')
 export class BottleController {
   constructor(private readonly bottleService: BottleService) { }
 
@@ -84,7 +84,7 @@ export class BottleController {
     return this.bottleService.getBottleRecordsBetweenDates(parent.parentId, childIdNumber, startDate, endDate);
   }
 
-  @Patch(':id')
+  @Post(':id')
   @UseGuards(JwtAuthGuard)
   update(
     @Param('id') id: string,
@@ -98,7 +98,7 @@ export class BottleController {
     return this.bottleService.update(recID, updateBottleDto, parent.parentId);
   }
 
-  @Delete(':id')
+  @Get('delete/:id')
   @UseGuards(JwtAuthGuard)
   remove(
     @Param('id') id: string,

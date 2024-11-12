@@ -7,7 +7,7 @@ import { isValid, parseISO } from 'date-fns';
 import { CreateNurseDto } from './dto/create-nurse-dto';
 import { UpdateNurseDto } from './dto/update-nurse-dto';
 
-@Controller('nurse')
+@Controller('feeding/nursing')
 export class NurseController {
   constructor(private readonly nurseService: NurseService) { }
 
@@ -79,7 +79,7 @@ export class NurseController {
     return this.nurseService.getNurseRecordsBetweenDates(parent.parentId, childIdNumber, startDate, endDate);
   }
 
-  @Patch(':id')
+  @Post(':id')
   @UseGuards(JwtAuthGuard)
   update(
     @Param('id') id: string,
@@ -89,7 +89,7 @@ export class NurseController {
     return this.nurseService.update(+id, updateNurseDto, parent.parentId);
   }
 
-  @Delete(':id')
+  @Get('delete/:id')
   @UseGuards(JwtAuthGuard)
   remove(
     @Param('id') id: string,
