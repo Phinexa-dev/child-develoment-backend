@@ -1,14 +1,19 @@
-import { Controller, Post, UseGuards, Request, Res } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Res, Body } from '@nestjs/common';
 import { LocalAuthGuard } from './guards/local-auth-guard';
 import { CurrentUser } from './current-user.decorator';
 import { Prisma, Parent } from '@prisma/client';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresg-auth.guard';
+import { ParentService } from 'src/parent/parent.service';
+import { CreateParentRequest } from 'src/parent/dto/create-parent.request';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) { }
+    constructor(
+        private readonly authService:AuthService,
+        private readonly parentService: ParentService
+    ){}
 
     @Post('login')
     @UseGuards(LocalAuthGuard)
@@ -23,4 +28,10 @@ export class AuthController {
         @Res({ passthrough: true }) response: Response) {
         await this.authService.login(parent, response)
     }
+
+    @Post('signup')
+    async signup( @Body() createParentDto: CreateParentRequest) {
+      return await this.parentService.create(createParentDto);
+    }
+
 }
