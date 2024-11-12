@@ -8,15 +8,14 @@ import { CurrentUser } from 'src/auth/current-user.decorator';
 export class ParentController {
   constructor(private readonly parentService: ParentService) {}
 
-  @Post()
-  async create(@Body() createParentDto: Prisma.ParentCreateInput) {
-    return this.parentService.create(createParentDto);
-  }
+  // @Post()
+  // async create(@Body() createParentDto: Prisma.ParentCreateInput) {
+  //   return this.parentService.create(createParentDto);
+  // }
 
   @Get()
   @UseGuards(JwtAuthGuard) 
   async findAll(@CurrentUser() parent: Parent) {
-    console.log(parent)
     return this.parentService.findAll();
   }
 

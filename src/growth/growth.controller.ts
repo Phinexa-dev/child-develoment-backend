@@ -3,7 +3,6 @@ import { GrowthService } from './growth.service';
 import { Parent, Prisma } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
-import { isDataURI, IsDate } from 'class-validator';
 import { isValid, parseISO } from 'date-fns';
 
 
@@ -73,6 +72,15 @@ export class GrowthController {
     }
     return this.growthService.findAll(parent.parentId,childID)
 
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  async getOne(
+    @Param('id') id: Number,
+    @CurrentUser() parent : Parent
+  ){
+    return this.growthService.findOne(+id,parent.parentId)
   }
   
   @Patch(':id')

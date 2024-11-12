@@ -75,6 +75,7 @@ model Child {
   OtherAlergy    OtherAlergy[]
   Growth         Growth[]
   Sleep          Sleep[]
+  Allergies      Allergies[]
   Vaccination    Vaccination[]
 }
 
@@ -299,12 +300,13 @@ model OtherAlergy {
 }
 
 model Growth {
-  id      Int      @id @default(autoincrement())
-  childId Int
-  date    DateTime
-  weight  Float?
-  height  Float?
-  note    String?
+  id        Int      @id @default(autoincrement())
+  childId   Int
+  date      DateTime
+  weight    Float?
+  height    Float?
+  note      String?
+  isDeleted Boolean @default(false)
 
   // Relations
   child Child @relation(fields: [childId], references: [childId])
@@ -318,6 +320,7 @@ model Sleep {
   duration   Int // Duration in minutes 
   note       String?
   sleepStyle String?
+  isDeleted Boolean @default(false)
 
   // Relations
   child Child @relation(fields: [childId], references: [childId])
@@ -333,6 +336,17 @@ model Article {
   author    String
 }
 
+model Allergies{
+  allergyId Int @id @default(autoincrement())
+  childId   Int 
+  note      String?
+  type      String
+  isDeleted Boolean
+  date      DateTime @default(now())
+
+ // Relations
+  child Child @relation(fields: [childId], references: [childId])
+}
 model Vaccine {
   id           Int           @id @default(autoincrement())
   name         String
