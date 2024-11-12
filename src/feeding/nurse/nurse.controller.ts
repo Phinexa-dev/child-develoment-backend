@@ -89,7 +89,7 @@ export class NurseController {
     return this.nurseService.update(+id, updateNurseDto, parent.parentId);
   }
 
-  @Get('/delete/:id')
+  @Get('delete/:id')
   @UseGuards(JwtAuthGuard)
   remove(
     @Param('id') id: string,
