@@ -25,4 +25,9 @@ export class CreateVaccinationDto {
   @IsArray()
   @IsInt({ each: true })
   symptomIds?: number[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  images?: string[]
 }

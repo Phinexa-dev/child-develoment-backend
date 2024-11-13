@@ -347,6 +347,7 @@ model Allergies{
  // Relations
   child Child @relation(fields: [childId], references: [childId])
 }
+
 model Vaccine {
   id           Int           @id @default(autoincrement())
   name         String
@@ -372,6 +373,7 @@ model Vaccination {
   child    Child         @relation(fields: [childId], references: [childId])
   vaccine  Vaccine      @relation(fields: [vaccineId], references: [id])
   symptoms postSymptom[]
+  images   VaccinationImages[]
 }
 
 model Symptom {
@@ -390,4 +392,12 @@ model postSymptom {
   // Relations
   vaccination Vaccination @relation(fields: [vaccinationId], references: [id])
   symptom     Symptom     @relation(fields: [symptomId], references: [id])
+}
+
+model VaccinationImages{
+  id            Int     @id @default(autoincrement())
+  image         String
+  isDeleted     Boolean @default(false) 
+  vaccinationId Int
+  vaccination   Vaccination  @relation(fields: [vaccinationId], references: [id])
 }
