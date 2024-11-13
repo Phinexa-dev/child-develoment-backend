@@ -1,4 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateSymptomDto } from './create-symptom.dto';
+import { IsOptional, IsString } from "class-validator";
 
-export class UpdateSymptomDto extends PartialType(CreateSymptomDto) {}
+export class UpdateSymptomDto {
+    @IsOptional()
+    @IsString()
+    name?: string;
+
+  }

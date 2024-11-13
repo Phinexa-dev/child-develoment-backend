@@ -23,31 +23,29 @@ export class VaccinationService {
 
   async create(createVaccinationDto: CreateVaccinationDto, parentId: number) {
     const { symptomIds, childId, vaccineId, ...vaccinationData } = createVaccinationDto;
-    this.verifyParentChildRelation(parentId, createVaccinationDto.childId)
+
+    await this.verifyParentChildRelation(parentId, childId);
 
     const childConnection = {
       connect: { childId: childId },
     };
+
     const child = await this.databaseService.child.findUnique({
-      where: {
-        childId: childId
-      },
-      select: { region: true }
-    })
+      where: { childId: childId },
+      select: { region: true },
+    });
 
     const vaccine = await this.databaseService.vaccine.findUnique({
       where: {
         id: vaccineId,
         isDeleted: false,
-        region: {
-          equals: child.region,
-          mode: 'insensitive'
-        }
-      }
-    })
+        region: { equals: child?.region, mode: 'insensitive' },
+      },
+    });
     if (!vaccine) {
-      throw new NotFoundException('vaccine not found');
+      throw new NotFoundException('Vaccine not found or does not match child’s region');
     }
+
     const vaccineConnection = vaccineId ? { connect: { id: vaccineId } } : undefined;
 
     let symptomConnections;
@@ -65,7 +63,9 @@ export class VaccinationService {
       }
 
       symptomConnections = {
-        connect: symptomIds.map(id => ({ id })),
+        create: symptomIds.map(id => ({
+          symptom: { connect: { id } },
+        })),
       };
     }
 
@@ -80,7 +80,8 @@ export class VaccinationService {
   }
 
   async findAll(parentId: number, childId: number) {
-    return this.databaseService.vaccination.findMany({
+    await this.verifyParentChildRelation(parentId, childId)
+    return await this.databaseService.vaccination.findMany({
       where: {
         childId,
         isDeleted: false
@@ -97,46 +98,53 @@ export class VaccinationService {
 
   async update(id: number, updateVaccinationDto: UpdateVaccinationDto, parentId: number) {
     const { symptomIds, ...vaccinationData } = updateVaccinationDto;
-  
-    // Verify if the vaccination exists and is not deleted
+
     const existingVaccination = await this.databaseService.vaccination.findUnique({
       where: { id },
-      include: { child: true },
+      include: { child: true, symptoms: { select: { symptomId: true, id: true } } },
     });
-  
+
     if (!existingVaccination || existingVaccination.isDeleted) {
       throw new NotFoundException(`Vaccination with ID ${id} not found`);
     }
 
     await this.verifyParentChildRelation(parentId, existingVaccination.childId);
 
-    let symptomConnections;
     if (symptomIds && symptomIds.length > 0) {
-      const existingSymptoms = await this.databaseService.symptom.findMany({
-        where: { id: { in: symptomIds }, isDeleted: false },
-        select: { id: true },
+      const existingSymptomIds = existingVaccination.symptoms.map(s => s.symptomId);
+      const symptomsToDelete = existingSymptomIds.filter(id => !symptomIds.includes(id));
+      const symptomsToAdd = symptomIds.filter(id => !existingSymptomIds.includes(id));
+
+      await this.databaseService.postSymptom.updateMany({
+        where: {
+          vaccinationId: id,
+          symptomId: { in: symptomsToDelete },
+        },
+        data: { isDeleted: true },
       });
-  
-      const existingSymptomIds = existingSymptoms.map(symptom => symptom.id);
-      const missingIds = symptomIds.filter(id => !existingSymptomIds.includes(id));
-  
-      if (missingIds.length > 0) {
-        throw new NotFoundException(`Symptoms with IDs ${missingIds.join(', ')} do not exist.`);
-      }
-  
-      symptomConnections = {
-        set: symptomIds.map(id => ({ id })),
-      };
+
+      await Promise.all(
+        symptomsToAdd.map(symptomId =>
+          this.databaseService.postSymptom.create({
+            data: {
+              vaccinationId: id,
+              symptomId: symptomId,
+            },
+          })
+        )
+      );
     }
+
     const data: Prisma.VaccinationUpdateInput = {
       ...vaccinationData,
-      symptoms: symptomConnections,
     };
+
     return this.databaseService.vaccination.update({
       where: { id },
       data,
     });
   }
+
 
   async remove(id: number, parentId: number) {
     const vaccination = await this.databaseService.vaccination.findUnique({ where: { id, isDeleted: false } });
@@ -150,4 +158,3 @@ export class VaccinationService {
     });
   }
 }
-4

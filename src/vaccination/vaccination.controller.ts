@@ -44,7 +44,7 @@ export class VaccinationController {
     @Param('id') id: string,
     @CurrentUser() parent: Parent,
     @Body() updateVaccinationDto: UpdateVaccinationDto) {
-    return this.vaccinationService.update(+id,parent.parentId, updateVaccinationDto);
+    return this.vaccinationService.update(+id, updateVaccinationDto, parent.parentId);
   }
 
   @Delete(':id')
@@ -53,6 +53,6 @@ export class VaccinationController {
     @Param('id') id: string,
     @CurrentUser() parent: Parent
   ) {
-    return this.vaccinationService.remove(+id,parent.parentId);
+    return this.vaccinationService.remove(+id, parent.parentId);
   }
 }

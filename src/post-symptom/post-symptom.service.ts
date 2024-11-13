@@ -77,7 +77,6 @@ export class PostSymptomService {
       throw new NotFoundException(`PostSymptom with ID ${id} not found.`);
     }
 
-    // Verify parent-child relationship
     await this.verifyParentChildRelation(parentId, postSymptom.vaccination.childId);
 
     return postSymptom;
@@ -93,10 +92,8 @@ export class PostSymptomService {
       throw new NotFoundException(`PostSymptom with ID ${id} not found.`);
     }
 
-    // Verify parent-child relationship
     await this.verifyParentChildRelation(parentId, postSymptom.vaccination.childId);
 
-    // Update the postSymptom entry
     return this.databaseService.postSymptom.update({
       where: { id },
       data: updatePostSymptomDto,
@@ -113,10 +110,8 @@ export class PostSymptomService {
       throw new NotFoundException(`PostSymptom with ID ${id} not found.`);
     }
 
-    // Verify parent-child relationship
     await this.verifyParentChildRelation(parentId, postSymptom.vaccination.childId);
 
-    // Soft delete the postSymptom entry by setting isDeleted to true
     return this.databaseService.postSymptom.update({
       where: { id },
       data: { isDeleted: true },

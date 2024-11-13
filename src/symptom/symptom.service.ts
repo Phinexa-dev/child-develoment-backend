@@ -1,26 +1,79 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSymptomDto } from './dto/create-symptom.dto';
 import { UpdateSymptomDto } from './dto/update-symptom.dto';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class SymptomService {
-  create(createSymptomDto: CreateSymptomDto) {
-    return 'This action adds a new symptom';
+  constructor(private readonly databaseService: DatabaseService) { }
+
+  async create(createSymptomDto: CreateSymptomDto) {
+
+    const existingSymptom = await this.databaseService.symptom.findFirst({
+      where: {
+        name: {
+          equals: createSymptomDto.name,
+          mode: 'insensitive',
+        }
+      },
+    });
+
+    if (existingSymptom) {
+      throw new BadRequestException(`Symptom with name "${createSymptomDto.name}" already exists.`);
+    }
+
+    return this.databaseService.symptom.create({
+      data: createSymptomDto
+    });
   }
 
-  findAll() {
-    return `This action returns all symptom`;
+
+  async findAll() {
+    return this.databaseService.symptom.findMany({
+      where: { isDeleted: false },
+      select: { id: true, name: true }
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} symptom`;
+  async findOne(id: number) {
+    const symptom = await this.databaseService.symptom.findUnique({
+      where: { id, isDeleted: false },
+    });
+
+    if (!symptom) {
+      throw new NotFoundException(`Symptom with ID ${id} not found.`);
+    }
+
+    return symptom;
   }
 
-  update(id: number, updateSymptomDto: UpdateSymptomDto) {
-    return `This action updates a #${id} symptom`;
+  async update(id: number, updateSymptomDto: UpdateSymptomDto) {
+    const symptom = await this.databaseService.symptom.findUnique({
+      where: { id, isDeleted: false },
+    });
+
+    if (!symptom) {
+      throw new NotFoundException(`Symptom with ID ${id} not found.`);
+    }
+
+    return this.databaseService.symptom.update({
+      where: { id },
+      data: updateSymptomDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} symptom`;
+  async remove(id: number) {
+    const symptom = await this.databaseService.symptom.findUnique({
+      where: { id, isDeleted: false },
+    });
+
+    if (!symptom) {
+      throw new NotFoundException(`Symptom with ID ${id} not found.`);
+    }
+
+    return this.databaseService.symptom.update({
+      where: { id },
+      data: { isDeleted: true },
+    });
   }
 }
