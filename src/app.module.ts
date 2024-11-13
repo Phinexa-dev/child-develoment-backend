@@ -22,6 +22,10 @@ import { MedicineCusModule } from './medicine-cus/medicine-cus.module';
 import { MedicationModule } from './medication/medication.module';
 import { MedicationSlotModule } from './medication-slot/medication-slot.module';
 import { AllergiesModule } from './allergies/allergies.module';
+import { VaccineModule } from './vaccine/vaccine.module';
+import { VaccinationModule } from './vaccination/vaccination.module';
+import { PostSymptomModule } from './post-symptom/post-symptom.module';
+import { SymptomModule } from './symptom/symptom.module';
 
 @Module({
   imports: [
@@ -48,7 +52,11 @@ import { AllergiesModule } from './allergies/allergies.module';
    MedicineCusModule,
    MedicationModule,
    MedicationSlotModule,
-   AllergiesModule],
+   AllergiesModule,
+   VaccineModule,
+   VaccinationModule,
+   PostSymptomModule,
+   SymptomModule],
   controllers: [AppController],
   providers: [AppService],
 })

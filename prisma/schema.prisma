@@ -15,39 +15,41 @@ datasource db {
 
 //example - CRUD 
 model User {
-  id Int @default(autoincrement()) @id
-  name String 
-  nic String @unique
+  id    Int    @id @default(autoincrement())
+  name  String
+  nic   String @unique
   phone String @unique
 }
 
 model School {
-  sid Int @default(autoincrement()) @id
+  sid  Int    @id @default(autoincrement())
   name String
 }
+
 model Class {
-  sid Int @default(autoincrement()) @id
+  sid  Int    @id @default(autoincrement())
   name String
 }
+
 //-------------------END of Example CRUD --------------
 
 model Parent {
-  parentId    Int     @id @default(autoincrement())
-  firstName   String
-  lastName    String
-  email       String  @unique
-  password    String
-  image       String?
-  bloodGroup  String?
-  phoneNumber String  @unique
-  address     String?
+  parentId     Int     @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  email        String  @unique
+  password     String
+  image        String?
+  bloodGroup   String?
+  phoneNumber  String  @unique
+  address      String?
   refreshToken String?
 
   // Relations
-  children     ParentChild[]
-  oldPasswords OldPasswords[]
-  MedicineCus  MedicineCus[]
-  customSolidItems  CategoryItems[]
+  children         ParentChild[]
+  oldPasswords     OldPasswords[]
+  MedicineCus      MedicineCus[]
+  customSolidItems CategoryItems[]
 }
 
 model Child {
@@ -74,10 +76,11 @@ model Child {
   Growth         Growth[]
   Sleep          Sleep[]
   Allergies      Allergies[]
+  Vaccination    Vaccination[]
 }
 
 model ParentChild {
-  id    Int      @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   parentId      Int
   childId       Int
   relation      String
@@ -87,19 +90,16 @@ model ParentChild {
   // Relations
   parent Parent @relation(fields: [parentId], references: [parentId])
   child  Child  @relation(fields: [childId], references: [childId])
-
 }
 
 model OldPasswords {
-  id    Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   parentId  Int
   password  String
   changedOn DateTime
 
   // Relations
   parent Parent @relation(fields: [parentId], references: [parentId])
-
-
 }
 
 model Nursing {
@@ -110,22 +110,22 @@ model Nursing {
   leftDuration  Int?
   rightDuration Int?
   notes         String?
-  isDeleted     Boolean   @default(false)
+  isDeleted     Boolean  @default(false)
 
   // Relations
   child Child @relation(fields: [childId], references: [childId])
 }
 
 model Bottle {
-  id      Int      @id @default(autoincrement())
-  childId Int
-  typeId  Int
-  volume  Float?
-  stash   String?
-  date    DateTime
-  time    DateTime
-  notes   String?
-  isDeleted     Boolean   @default(false)
+  id        Int      @id @default(autoincrement())
+  childId   Int
+  typeId    Int
+  volume    Float?
+  stash     String?
+  date      DateTime
+  time      DateTime
+  notes     String?
+  isDeleted Boolean  @default(false)
 
   // Relations
   child    Child    @relation(fields: [childId], references: [childId])
@@ -133,31 +133,29 @@ model Bottle {
 }
 
 model Solids {
-  solidId  Int      @id @default(autoincrement())
-  childId  Int
-  reaction String?
-  note     String?
-  date     DateTime
-  time     DateTime
-  isDeleted     Boolean   @default(false)
+  solidId   Int      @id @default(autoincrement())
+  childId   Int
+  reaction  String?
+  note      String?
+  date      DateTime
+  time      DateTime
+  isDeleted Boolean  @default(false)
 
   // Relations
   child      Child      @relation(fields: [childId], references: [childId])
-  categories SolidCat[]  
+  categories SolidCat[]
 }
 
 model SolidCat {
-  id    Int      @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   solidId      Int
-  itemId       Int    
+  itemId       Int
   weightVolume Float?
-   isDeleted     Boolean   @default(false)
+  isDeleted    Boolean @default(false)
 
   // Relations
-  solid        Solids         @relation(fields: [solidId], references: [solidId])
-  categoryItem CategoryItems  @relation(fields: [itemId], references: [itemId])
-  
-
+  solid        Solids        @relation(fields: [solidId], references: [solidId])
+  categoryItem CategoryItems @relation(fields: [itemId], references: [itemId])
 }
 
 model Category {
@@ -178,18 +176,18 @@ model CategoryItems {
   isDeleted  Boolean @default(false)
 
   // Relations
-  category  Category   @relation(fields: [categoryId], references: [categoryId])
-  parent    Parent?    @relation(fields: [parentId], references: [parentId])
-  solidCats SolidCat[]
+  category     Category       @relation(fields: [categoryId], references: [categoryId])
+  parent       Parent?        @relation(fields: [parentId], references: [parentId])
+  solidCats    SolidCat[]
   SolidsAlergy SolidsAlergy[]
 
   @@unique([categoryId, itemId])
 }
 
 model MilkType {
-  typeID   Int    @id @default(autoincrement())
-  milkType String
-  isDeleted     Boolean   @default(false)
+  typeID    Int     @id @default(autoincrement())
+  milkType  String
+  isDeleted Boolean @default(false)
 
   // Relations
   bottles    Bottle[]
@@ -203,7 +201,7 @@ model Medication {
   startingDate DateTime
   endingDate   DateTime
   frequency    String
-  isDeleted    Boolean
+  isDeleted    Boolean  @default(false)
 
   // Relations
   child    Child            @relation(fields: [childId], references: [childId])
@@ -219,7 +217,7 @@ model MedicationSlot {
   amount           Float
   status           String // taken/missed
   isDeleted        Boolean   @default(false)
- 
+
   // Relations
   medication Medication @relation(fields: [medicationId], references: [id])
 }
@@ -235,23 +233,23 @@ model Medicine {
 }
 
 model MedicineDef {
-  medID       Int    @id
+  medID       Int     @id
   name        String
   description String
   form        String // tablet, liquid, etc.
-  isDeleted   Boolean  @default(false)
+  isDeleted   Boolean @default(false)
 
   // Relations
   medicine Medicine @relation(fields: [medID], references: [medID])
 }
 
 model MedicineCus {
-  medID       Int    @id
+  medID       Int     @id
   parentId    Int
   name        String
   description String
   form        String
-  isDeleted   Boolean  @default(false)
+  isDeleted   Boolean @default(false)
 
   // Relations
   medicine Medicine @relation(fields: [medID], references: [medID])
@@ -259,10 +257,10 @@ model MedicineCus {
 }
 
 model SolidsAlergy {
-  id       Int      @id @default(autoincrement())
-  itemId   Int
-  childId  Int
-  note     String?
+  id      Int     @id @default(autoincrement())
+  itemId  Int
+  childId Int
+  note    String?
 
   // Relations
   categoryItem CategoryItems @relation(fields: [itemId], references: [itemId]) // Referencing CategoryItems instead of SolidCat
@@ -270,7 +268,7 @@ model SolidsAlergy {
 }
 
 model MilkAlergy {
-  id    Int      @id @default(autoincrement())
+  id      Int     @id @default(autoincrement())
   typeId  Int
   childId Int
   note    String?
@@ -278,12 +276,10 @@ model MilkAlergy {
   // Relations
   milkType MilkType @relation(fields: [typeId], references: [typeID])
   child    Child    @relation(fields: [childId], references: [childId])
-
-  
 }
 
 model MedicineAlergy {
-  id    Int      @id @default(autoincrement())
+  id      Int     @id @default(autoincrement())
   medId   Int
   childId Int
   note    String?
@@ -291,8 +287,6 @@ model MedicineAlergy {
   // Relations
   medicine Medicine @relation(fields: [medId], references: [medID])
   child    Child    @relation(fields: [childId], references: [childId])
-
-  
 }
 
 model OtherAlergy {
@@ -316,8 +310,6 @@ model Growth {
 
   // Relations
   child Child @relation(fields: [childId], references: [childId])
-
-  
 }
 
 model Sleep {
@@ -339,7 +331,7 @@ model Article {
   content   String
   title     String
   tag       String
-  image     String?  // Optional field
+  image     String? // Optional field
   date      DateTime
   author    String
 }
@@ -354,4 +346,58 @@ model Allergies{
 
  // Relations
   child Child @relation(fields: [childId], references: [childId])
+}
+
+model Vaccine {
+  id           Int           @id @default(autoincrement())
+  name         String
+  region       String
+  notes        String? //importance
+  period       String?
+  ageInMonths  Int
+  whereTo      String?
+  isDeleted    Boolean       @default(false)
+  vaccinations Vaccination[]
+}
+
+model Vaccination {
+  id        Int      @id @default(autoincrement())
+  childId   Int
+  vaccineId Int // Optional foreign key to Vaccine
+  date      DateTime
+  venue     String
+  notes     String?
+  isDeleted Boolean  @default(false)
+
+  // Relations
+  child    Child         @relation(fields: [childId], references: [childId])
+  vaccine  Vaccine      @relation(fields: [vaccineId], references: [id])
+  symptoms postSymptom[]
+  images   VaccinationImages[]
+}
+
+model Symptom {
+  id           Int           @id @default(autoincrement())
+  name         String
+  isDeleted    Boolean       @default(false)
+  postSymptoms postSymptom[]
+}
+
+model postSymptom {
+  id            Int     @id @default(autoincrement())
+  vaccinationId Int
+  symptomId     Int
+  isDeleted     Boolean @default(false)
+
+  // Relations
+  vaccination Vaccination @relation(fields: [vaccinationId], references: [id])
+  symptom     Symptom     @relation(fields: [symptomId], references: [id])
+}
+
+model VaccinationImages{
+  id            Int     @id @default(autoincrement())
+  image         String
+  isDeleted     Boolean @default(false) 
+  vaccinationId Int
+  vaccination   Vaccination  @relation(fields: [vaccinationId], references: [id])
 }
