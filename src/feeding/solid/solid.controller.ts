@@ -7,7 +7,7 @@ import { isValid, parseISO } from 'date-fns';
 import { CreateSolidDto } from './dto/create-solid-dto';
 import { UpdateSolidDto } from './dto/update-solid-dto';
 
-@Controller('solid')
+@Controller('feeding/solid')
 export class SolidController {
   constructor(private readonly solidService: SolidService) { }
 
@@ -81,7 +81,7 @@ export class SolidController {
     return this.solidService.getSolidRecordsBetweenDates(parent.parentId, childIdNumber, startDate, endDate);
   }
 
-  @Patch(':id')
+  @Post(':id')
   @UseGuards(JwtAuthGuard)
   update(
     @Param('id') id: string,
@@ -90,7 +90,7 @@ export class SolidController {
     return this.solidService.update(+id, parent.parentId, updateSolidDto);
   }
 
-  @Delete(':id')
+  @Get('delete/:id')
   @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string,
     @CurrentUser() parent: Parent) {
