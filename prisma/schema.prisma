@@ -137,8 +137,7 @@ model Solids {
   childId   Int
   reaction  String?
   note      String?
-  date      DateTime
-  time      DateTime
+  dateTime  DateTime @default(now())
   isDeleted Boolean  @default(false)
 
   // Relations
@@ -150,7 +149,8 @@ model SolidCat {
   id           Int     @id @default(autoincrement())
   solidId      Int
   itemId       Int
-  weightVolume Float?
+  numberOfUnits Float?
+  unitOfMeasure String @default("g")
   isDeleted    Boolean @default(false)
 
   // Relations
@@ -171,7 +171,6 @@ model CategoryItems {
   categoryId Int
   isDefault  Boolean
   parentId   Int?
-  isSolid    Boolean
   itemName   String
   isDeleted  Boolean @default(false)
 

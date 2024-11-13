@@ -1,15 +1,19 @@
 import { Type } from "class-transformer";
-import { IsArray, IsDateString, IsInt, IsNotEmpty, IsOptional, IsString, Min, ValidateNested } from "class-validator";
+import { IsArray, IsDateString, IsInt, IsNotEmpty, IsNotEmptyObject, IsOptional, IsString, Min, ValidateNested } from "class-validator";
 
-class CategoryCreateDto {
+ export class CategoryCreateDto {
     @IsNotEmpty()
     @IsInt()
     @Min(0)
-    weightVolume: number;
+    numberOfUnits: number;
+
+    @IsNotEmpty()
+    @IsString()
+    unitOfMeasure: string
 
     @IsNotEmpty()
     @IsInt()
-    itemId: number;
+    id: number;
 }
 
 export class CreateSolidDto {
@@ -27,15 +31,10 @@ export class CreateSolidDto {
 
     @IsNotEmpty()
     @IsDateString()
-    date: string;
-
-    @IsNotEmpty()
-    @IsDateString()
-    time: string;
+    dateTime: string;
 
     @IsArray()
-    @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => CategoryCreateDto)
-    categories: CategoryCreateDto[];
+    ingredients: CategoryCreateDto[];
 }

@@ -1,4 +1,6 @@
-import { IsDateString, IsOptional, IsString } from "class-validator";
+import { Type } from "class-transformer";
+import { IsArray, IsDateString, IsOptional, IsString, ValidateNested } from "class-validator";
+import { CategoryCreateDto } from "./create-solid-dto";
 
 export class UpdateSolidDto {
     @IsOptional()
@@ -11,9 +13,11 @@ export class UpdateSolidDto {
   
     @IsOptional()
     @IsDateString()
-    date?: string;
+    dateTime?: string;
   
+    @IsArray()
     @IsOptional()
-    @IsDateString()
-    time?: string;
+    @ValidateNested({ each: true })
+    @Type(() => CategoryCreateDto)
+    ingredients: CategoryCreateDto[];
   }
