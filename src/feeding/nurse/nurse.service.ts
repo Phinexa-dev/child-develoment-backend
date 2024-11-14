@@ -34,8 +34,8 @@ export class NurseService {
       }
 
       const nursingData: Prisma.NursingCreateInput = {
-        date: createNurseDto.date,
-        time: createNurseDto.time,
+        startingTime: createNurseDto.startingTime,
+        endingTime: createNurseDto.endingTime,
         leftDuration: createNurseDto.leftDuration,
         rightDuration: createNurseDto.rightDuration,
         notes: createNurseDto.notes,
@@ -44,7 +44,7 @@ export class NurseService {
         },
       };
 
-      return this.databaseService.nursing.create({
+      return await this.databaseService.nursing.create({
         data: nursingData,
       });
     } catch (e) {
@@ -61,18 +61,18 @@ export class NurseService {
           childId: childId,
           isDeleted: false,
         },
-        select:{
-          id:true,
-          childId:true,
-          date:true,
-          time:true,
-          leftDuration:true,
-          rightDuration:true,
-          notes:true,
+        select: {
+          id: true,
+          childId: true,
+          startingTime: true,
+          endingTime: true,
+          leftDuration: true,
+          rightDuration: true,
+          notes: true,
         },
         take: limit,
         skip: offset,
-        orderBy: { date: 'desc' }
+        orderBy: { startingTime: 'desc' }
       });
     } catch (e) {
       throw new BadRequestException(e.message || e);
@@ -131,7 +131,7 @@ export class NurseService {
     return this.databaseService.nursing.findMany({
       where: {
         childId: childId,
-        date: {
+        startingTime: {
           gte: startDate,
           lte: endDate,
         },

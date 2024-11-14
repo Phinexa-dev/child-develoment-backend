@@ -3,11 +3,11 @@ import { IsDateString, IsInt, IsOptional, IsString, Min } from "class-validator"
 export class UpdateNurseDto {
     @IsOptional()
     @IsDateString()
-    date?: string;
+    startingTime?: string;
   
     @IsOptional()
     @IsDateString()
-    time?: string;
+    endingTime?: string;
   
     @IsOptional()
     @IsInt()
@@ -23,7 +23,4 @@ export class UpdateNurseDto {
     @IsString()
     notes?: string;
   
-    @IsOptional()
-    @IsInt()
-    childId?: number;
   }

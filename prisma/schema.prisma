@@ -105,8 +105,8 @@ model OldPasswords {
 model Nursing {
   id            Int      @id @default(autoincrement())
   childId       Int
-  date          DateTime
-  time          DateTime
+  startingTime  DateTime @default(now())
+  endingTime    DateTime @default(now())
   leftDuration  Int?
   rightDuration Int?
   notes         String?
