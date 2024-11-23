@@ -2,10 +2,10 @@ import { IsDateString, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "clas
 
 export class CreateNurseDto {
     @IsDateString()
-    date: string;
+    startingTime: string;
 
     @IsDateString()
-    time: string;
+    endingTime: string;
 
     @IsOptional()
     @IsInt()

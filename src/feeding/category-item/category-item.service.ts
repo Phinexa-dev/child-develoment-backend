@@ -1,15 +1,17 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
+import { CreateCategoryItemDto } from './category-item-dto/create-category-item-dto';
+import { UpdateCategoryItemDto } from './category-item-dto/update-category-item-dto';
 
 @Injectable()
 export class CategoryItemService {
 
   constructor(private readonly databaseService: DatabaseService) { }
 
-  async create(createCategoryItemDto: Prisma.CategoryItemsCreateInput, parentId: number) {
+  async create(createCategoryItemDto: CreateCategoryItemDto, parentId: number) {
     const categoryExists = await this.databaseService.category.findUnique({
-      where: { categoryId: createCategoryItemDto.category.connect.categoryId },
+      where: { categoryId: createCategoryItemDto.categoryId },
     });
 
     if (!categoryExists) {
@@ -19,7 +21,7 @@ export class CategoryItemService {
     if (!createCategoryItemDto.isDefault) {
       const existingItem = await this.databaseService.categoryItems.findFirst({
         where: {
-          categoryId: createCategoryItemDto.category.connect.categoryId,
+          categoryId: createCategoryItemDto.categoryId,
           itemName: { equals: createCategoryItemDto.itemName, mode: 'insensitive' },
           parentId,
           isDeleted: false
@@ -31,18 +33,15 @@ export class CategoryItemService {
       }
     }
 
-    if (createCategoryItemDto.isDefault) {
-      createCategoryItemDto.parent = null;
-    }
-
     const categoryItemData: Prisma.CategoryItemsCreateInput = {
-      ...createCategoryItemDto,
+      itemName: createCategoryItemDto.itemName,
+      isDefault: createCategoryItemDto.isDefault,
+      category: { connect: { categoryId: createCategoryItemDto.categoryId } },
       parent: !createCategoryItemDto.isDefault ? { connect: { parentId } } : undefined,
+      imagePath: createCategoryItemDto.imagePath
     };
 
-    return this.databaseService.categoryItems.create({
-      data: categoryItemData,
-    });
+    return this.databaseService.categoryItems.create({ data: categoryItemData });
   }
 
 
@@ -82,32 +81,33 @@ export class CategoryItemService {
     return categoryItem;
   }
 
-  async update(id: number, parentID: number, updateCategoryItemDto: Prisma.CategoryItemsUpdateInput) {
+  async update(id: number, parentId: number, updateCategoryItemDto: UpdateCategoryItemDto) {
     const categoryItem = await this.databaseService.categoryItems.findUnique({
-      where: {
-        itemId: id,
-        isDefault: false
-      },
+      where: { itemId: id },
     });
-    if (!categoryItem) {
+
+    if (!categoryItem || categoryItem.isDeleted) {
       throw new NotFoundException(`CategoryItem with id ${id} not found.`);
     }
+
     if (categoryItem.isDefault) {
       throw new BadRequestException(`Default category items cannot be updated.`);
     }
+
     if (!categoryItem.isDefault && updateCategoryItemDto.isDefault) {
-      throw new BadRequestException();
+      throw new BadRequestException(`Cannot mark a non-default category item as default.`);
     }
-    if (categoryItem.parentId !== parentID) {
+
+    if (categoryItem.parentId !== parentId) {
       throw new UnauthorizedException(`You are not authorized to update this category item.`);
     }
+
     return this.databaseService.categoryItems.update({
       where: { itemId: id },
-      data: {
-        ...updateCategoryItemDto,
-      },
+      data: updateCategoryItemDto,
     });
   }
+
 
   async remove(id: number, parentId: number) {
     const categoryItem = await this.databaseService.categoryItems.findUnique({
