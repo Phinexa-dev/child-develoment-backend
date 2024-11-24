@@ -101,6 +101,7 @@ export class SolidService {
               select: {
                 itemId: true,
                 itemName: true,
+                imagePath: true
               }
             }
           }
@@ -287,7 +288,8 @@ function transformResponse(data) {
       id: category.id,
       name: category.categoryItem.itemName,
       unitOfMeasure: category.unitOfMeasure,
-      numberOfUnits: category.numberOfUnits || 0
+      numberOfUnits: category.numberOfUnits || 0,
+      imagePath: category.categoryItem.imagePath
     }))
   }));
 }

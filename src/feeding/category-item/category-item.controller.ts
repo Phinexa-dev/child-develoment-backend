@@ -3,6 +3,8 @@ import { CategoryItemService } from './category-item.service';
 import { Parent, Prisma } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
+import { CreateCategoryItemDto } from './category-item-dto/create-category-item-dto';
+import { UpdateCategoryItemDto } from './category-item-dto/update-category-item-dto';
 
 
 @Controller('category-item')
@@ -11,7 +13,7 @@ export class CategoryItemController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(@Body() createCategoryItemDto: Prisma.CategoryItemsCreateInput,
+  create(@Body() createCategoryItemDto: CreateCategoryItemDto,
     @CurrentUser() parent: Parent,) {
     return this.categoryItemService.create(createCategoryItemDto, parent.parentId);
   }
@@ -30,7 +32,7 @@ export class CategoryItemController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(@Param('id') id: string, @Body() updateCategoryItemDto: Prisma.CategoryItemsUpdateInput, @CurrentUser() parent: Parent) {
+  update(@Param('id') id: string, @Body() updateCategoryItemDto: UpdateCategoryItemDto, @CurrentUser() parent: Parent) {
     return this.categoryItemService.update(+id,parent.parentId, updateCategoryItemDto);
   }
 
