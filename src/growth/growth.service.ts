@@ -1,6 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
+import { CreateGrowthDto } from './dto/create-growth-dto';
+import { UpdateGrowthDto } from './dto/update-growth-dto';
+
 
 @Injectable()
 export class GrowthService {
@@ -21,17 +23,20 @@ export class GrowthService {
     }
   }
 
-  async create(createGrowthDto: Prisma.GrowthCreateInput, parentId: number) {
-    await this.verifyParentChildRelation(parentId, createGrowthDto.child.connect.childId);
+  async create(createGrowthDto: CreateGrowthDto, parentId: number) {
+    await this.verifyParentChildRelation(parentId, createGrowthDto.childId);
 
-    return this.databaseService.growth.create({
+    if (!createGrowthDto.height && !createGrowthDto.weight && !createGrowthDto.note) {
+      throw new BadRequestException('body should at least contain either note,weight or height')
+    }
+    return await this.databaseService.growth.create({
       data: {
         date: createGrowthDto.date,
         weight: createGrowthDto.weight,
         height: createGrowthDto.height,
         note: createGrowthDto.note,
         child: {
-          connect: { childId: createGrowthDto.child.connect.childId },
+          connect: { childId: createGrowthDto.childId },
         },
       },
     });
@@ -49,16 +54,40 @@ export class GrowthService {
         },
         isDeleted: false
       },
+      select: {
+        id: true,
+        childId: true,
+        weight: true,
+        height: true,
+        note: true,
+        date: true
+      },
+      orderBy: {
+        date: 'desc'
+      }
     });
   }
 
-  async findAll(parentId: number, childId: number) {
+  async findAll(parentId: number, childId: number, limit: number, offset: number) {
     await this.verifyParentChildRelation(parentId, childId)
     return this.databaseService.growth.findMany({
       where: {
         childId: childId,
         isDeleted: false
-      }
+      },
+      select: {
+        id: true,
+        childId: true,
+        weight: true,
+        height: true,
+        note: true,
+        date: true
+      },
+      orderBy: {
+        date: 'desc'
+      },
+      take: limit,
+      skip: offset
     });
   }
 
@@ -67,6 +96,14 @@ export class GrowthService {
       where: {
         id,
         isDeleted: false
+      },
+      select: {
+        id: true,
+        childId: true,
+        weight: true,
+        height: true,
+        note: true,
+        date: true
       }
     })
     if (!record) {
@@ -76,10 +113,10 @@ export class GrowthService {
     return record;
   }
 
-  async updateGrowthRecord(parentId: number, growthId: number, updateGrowthDto: Prisma.GrowthUpdateInput) {
+  async updateGrowthRecord(parentId: number, growthId: number, updateGrowthDto: UpdateGrowthDto) {
 
     const growthRecord = await this.databaseService.growth.findUnique({
-      where: { id: growthId },
+      where: { id: growthId, isDeleted: false },
     });
 
     if (!growthRecord) {

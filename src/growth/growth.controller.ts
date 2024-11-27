@@ -4,45 +4,32 @@ import { Parent, Prisma } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { isValid, parseISO } from 'date-fns';
+import { CreateGrowthDto } from './dto/create-growth-dto';
+import { UpdateGrowthDto } from './dto/update-growth-dto';
 
 
 @Controller('growth')
 export class GrowthController {
-  constructor(private readonly growthService: GrowthService) {}
+  constructor(private readonly growthService: GrowthService) { }
 
-  @Post('child/:childId')
+  @Post('')
   @UseGuards(JwtAuthGuard)
   async create(
-    @Body() createGrowthDto: Prisma.GrowthCreateInput,
+    @Body() createGrowthDto: CreateGrowthDto,
     @CurrentUser() parent: Parent,
-    @Param('childId') childId: string,
   ) {
-    const childIdNumber = parseInt(childId, 10);
-
-    if (isNaN(childIdNumber)) {
-      throw new BadRequestException('Invalid childId format.');
-    }
-
-    if (!createGrowthDto.child) {
-      createGrowthDto.child = {
-        connect: { childId: childIdNumber },
-      };
-    } else {
-      createGrowthDto.child.connect = { childId: childIdNumber };
-    }
 
     return this.growthService.create(createGrowthDto, parent.parentId);
   }
 
-  @Get('child/:childId/date-range')
+  @Get(':childId/date-range')
   @UseGuards(JwtAuthGuard)
   async getGrowthRecordsBetweenDates(
-    @Param('childId') childId: string, 
+    @Param('childId') childId: string,
     @Query('start') start: string,
     @Query('end') end: string,
-    @CurrentUser() parent: Parent,) 
-    {
- 
+    @CurrentUser() parent: Parent,) {
+
     const childIdNumber = parseInt(childId, 10);
 
     if (isNaN(childIdNumber)) {
@@ -60,17 +47,30 @@ export class GrowthController {
     return this.growthService.getGrowthRecordsBetweenDates(parent.parentId, childIdNumber, startDate, endDate);
   }
 
-  @Get('child/:childId')
+  @Get('/:childId')
   @UseGuards(JwtAuthGuard)
   async getAll(
     @Param('childId') childId: string,
-    @CurrentUser() parent : Parent
-  ){
-    const childID = parseInt(childId,10)
+    @CurrentUser() parent: Parent,
+    @Query('limit') limit: string = '10', // Default limit
+    @Query('offset') offset: string = '0' // Default offset
+  ) {
+    const childID = parseInt(childId, 10)
     if (isNaN(childID)) {
       throw new BadRequestException('Invalid childId format.');
     }
-    return this.growthService.findAll(parent.parentId,childID)
+    const limitNum = parseInt(limit, 10);
+    const offsetNum = parseInt(offset, 10);
+
+    if (isNaN(limitNum) || limitNum <= 0) {
+      throw new BadRequestException('Limit must be a positive integer.');
+    }
+
+    if (isNaN(offsetNum) || offsetNum < 0) {
+      throw new BadRequestException('Offset must be a non-negative integer.');
+    }
+
+    return this.growthService.findAll(parent.parentId, childID,limitNum,offsetNum)
 
   }
 
@@ -78,32 +78,32 @@ export class GrowthController {
   @UseGuards(JwtAuthGuard)
   async getOne(
     @Param('id') id: Number,
-    @CurrentUser() parent : Parent
-  ){
-    return this.growthService.findOne(+id,parent.parentId)
+    @CurrentUser() parent: Parent
+  ) {
+    return this.growthService.findOne(+id, parent.parentId)
   }
-  
-  @Patch(':id')
+
+  @Post(':id')
   @UseGuards(JwtAuthGuard)
   async updateGrowth(
     @Param('id') id: string,
-    @Body() updateGrowthDto: Prisma.GrowthUpdateInput,
+    @Body() updateGrowthDto: UpdateGrowthDto,
     @CurrentUser() parent: Parent,
   ) {
-    const ID = parseInt(id,10)
+    const ID = parseInt(id, 10)
     if (isNaN(ID)) {
       throw new BadRequestException('Invalid childId format.');
     }
     return this.growthService.updateGrowthRecord(parent.parentId, ID, updateGrowthDto);
   }
-
-  @Delete(':id')
+  
+  @Get('/delete/:id')
   @UseGuards(JwtAuthGuard)
   async deleteGrowth(
     @Param('id') id: string,
     @CurrentUser() parent: Parent,
   ) {
-    const ID = parseInt(id,10)
+    const ID = parseInt(id, 10)
     if (isNaN(ID)) {
       throw new BadRequestException('Invalid Id format.');
     }
