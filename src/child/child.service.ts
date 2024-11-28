@@ -1,27 +1,36 @@
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { Child, Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
+import { CreateChildDto } from './dto/create-child-dto';
+import { UpdateChildDto } from './dto/update-child-dto';
 
 
 @Injectable()
 export class ChildService {
 
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly databaseService: DatabaseService) { }
 
-  async create(createChildDto: Prisma.ChildCreateInput, parentId: number) {
+  async create(createChildDto: CreateChildDto, parentId: number) {
 
     const child = await this.databaseService.child.create({
       data: {
-        ...createChildDto,
-      }
-    })
+        firstName: createChildDto.firstName,
+        middleName: createChildDto.middleName,
+        lastName: createChildDto.lastName,
+        birthday: createChildDto.birthday,
+        region: createChildDto.region,
+        image: createChildDto.image,
+        gender: createChildDto.gender,
+        bloodGroup: createChildDto.bloodGroup,
+      },
+    });
+
     await this.databaseService.parentChild.create({
       data: {
         parentId: parentId,
         childId: (await child).childId,
-        relation: 'Parent',  // You can modify this value as needed
-        status: 'Active',    // You can modify this value as needed
-        requestedDate: new Date(),  // Current date or you can set a specific date
+        relation: 'Parent',
+        status: 'Active',
+        requestedDate: new Date(),
       },
     });
 
@@ -31,15 +40,14 @@ export class ChildService {
   async findAll(parentId: number) {
     const activeChildren = await this.databaseService.parentChild.findMany({
       where: {
-        parentId: parentId, // Filter by the parent ID
-        status: 'Active',   // Only get active relations
+        parentId: parentId,
+        status: 'Active',
       },
       include: {
-        child: true, // Include the child details in the response
+        child: true,
       },
     });
-    
-    // Extracting the child details
+
     const children = activeChildren.map(relation => relation.child);
     return children;
   }
@@ -55,18 +63,43 @@ export class ChildService {
     });
 
     if (!parentChildRelation) {
-      // If no relationship is found, throw an exception or return null
       throw new NotFoundException('Child does not belong to this parent or is not active.');
     }
 
-    return this.databaseService.child.findUnique({
+    return await this.databaseService.child.findUnique({
       where: {
         childId: id,
       }
     })
   }
 
-  async update(id: number, updateChildDto: Prisma.ChildUpdateInput, parentId: number) {
+  async update(id: number, updateChildDto: UpdateChildDto, parentId: number) {
+
+    const parentChildRelation = await this.databaseService.parentChild.findFirst({
+      where: {
+        parentId: parentId,
+        childId: id,
+        status: 'Active',
+      },
+    });
+
+    if (!parentChildRelation || parentChildRelation.status !== 'Active') {
+      throw new UnauthorizedException('You are not authorized to update this child information');
+    }
+
+    const updatedChild = await this.databaseService.child.update({
+      where: { childId: id },
+      data: {
+        ...updateChildDto,
+      },
+    });
+
+    return updatedChild;
+  }
+
+
+  async remove(id: number, parentId: number): Promise<void> {
+
     const parentChildRelation = await this.databaseService.parentChild.findFirst({
       where: {
         parentId: parentId,
@@ -75,38 +108,17 @@ export class ChildService {
       },
     });
 
-    // Check if the relation exists and is active
-    if (!parentChildRelation || parentChildRelation.status !== 'Active') {
-      throw new UnauthorizedException('You are not authorized to update this child');
-    }
-    // Update the child
-    const updatedChild = await this.databaseService.child.update({
-      where: { childId: id },
-      data: updateChildDto,
-    });
-    return updatedChild;
-  }
-
-  async remove(id: number, parentId: number): Promise<void> {
-    // Find the child and include the parent association
-    const child = await this.databaseService.child.findUnique({
-      where: { childId:id },
-      include: { parents: true }, 
-    });
-    // Check if the child exists
-    if (!child) {
-      throw new NotFoundException(`Child with ID ${id} not found`);
-    }
-    // Check if the parent has access to delete this child
-    const parentChildRelation = child.parents.find(relation => relation.parentId === parentId);
     if (!parentChildRelation) {
-      throw new ForbiddenException(`Parent with ID ${parentId} does not have access to delete this child`);
+      throw new NotFoundException('Child does not belong to this parent or is not active.');
     }
-    // Delete the child
-    await this.databaseService.child.delete({
-      where: { childId:id },
-    });
 
-    return;
+    await this.databaseService.parentChild.update({
+      where: {
+        id: parentChildRelation.id
+      }, data: {
+        status: 'Deleted'
+      }
+    })
+    return
   }
 }
