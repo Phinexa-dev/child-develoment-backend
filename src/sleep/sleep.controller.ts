@@ -8,7 +8,7 @@ import { isValid, parseISO } from 'date-fns';
 
 @Controller('sleep')
 export class SleepController {
-  constructor(private readonly sleepService: SleepService) {}
+  constructor(private readonly sleepService: SleepService) { }
 
   @Post('child/:childId')
   @UseGuards(JwtAuthGuard)
@@ -35,7 +35,7 @@ export class SleepController {
   @Get('child/:childId/date-range')
   @UseGuards(JwtAuthGuard)
   async getSleepRecordsBetweenDates(
-    @Param('childId') childId: string, 
+    @Param('childId') childId: string,
     @Query('start') start: string,
     @Query('end') end: string,
     @CurrentUser() parent: Parent,
@@ -62,7 +62,7 @@ export class SleepController {
     @CurrentUser() parent: Parent,
   ) {
     const childID = parseInt(childId, 10);
-    
+
     if (isNaN(childID)) {
       throw new BadRequestException('Invalid childId format.');
     }
@@ -94,5 +94,17 @@ export class SleepController {
       throw new BadRequestException('Invalid ID format.');
     }
     return this.sleepService.deleteSleepRecord(parent.parentId, ID);
+  }
+
+  @Get('summary/:childId')
+  @UseGuards(JwtAuthGuard)
+  summary(
+    @Param('childId') childId: string,
+    @CurrentUser() parent: Parent) {
+    const childID = parseInt(childId, 10)
+    if (isNaN(childID)) {
+      throw new BadRequestException('Invalid childId format.');
+    }
+    return this.sleepService.summary(parent.parentId, +childId);
   }
 }

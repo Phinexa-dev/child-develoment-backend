@@ -104,4 +104,74 @@ export class SleepService {
       data: { isDeleted: true }
     });
   }
+
+  async summary(parentId: number, childId: number) {
+    await this.verifyParentChildRelation(parentId, childId);
+
+    const records = await this.databaseService.sleep.findMany({
+      where: {
+        childId: childId,
+        isDeleted: false,
+      },
+      select: {
+        date: true,
+        duration: true,
+      },
+      orderBy: {
+        date: 'asc',
+      },
+      take: 20,
+    });
+
+    if (records.length === 0) {
+      throw new NotFoundException('No sleep records found for this child.');
+    }
+
+    const dayStartHour = 6;
+    const nightStartHour = 18;
+
+    let dayTimeDuration = 0;
+    let nightTimeDuration = 0;
+    let totalDuration = 0;
+    const intervals = [];
+
+    for (let i = 0; i < records.length; i++) {
+      const record = records[i];
+      const sleepDate = new Date(record.date);
+      const sleepHour = sleepDate.getHours();
+      totalDuration += record.duration;
+
+      if (sleepHour >= dayStartHour && sleepHour < nightStartHour) {
+        dayTimeDuration += record.duration;
+      } else {
+        nightTimeDuration += record.duration;
+      }
+
+      if (i > 0) {
+        const prevDate = new Date(records[i - 1].date);
+        const interval = (prevDate.getTime() - sleepDate.getTime()) / (1000 * 60);
+        intervals.push(interval);
+      }
+    }
+
+    const formatDuration = (duration: number) => {
+      const hours = Math.floor(duration / 60);
+      const minutes = Math.round(duration % 60);
+      return { hours, minutes };
+    };
+
+    const averageDayTimeDuration = dayTimeDuration / records.length;
+    const averageNightTimeDuration = nightTimeDuration / records.length;
+    const averageTotalDuration = totalDuration / records.length;
+    const averageInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
+
+    return {
+      startingDay: new Date(records[0].date).toISOString().split('T')[0],
+      endingDay: new Date(records[records.length - 1].date).toISOString().split('T')[0],
+      averageDayTimeDuration: formatDuration(averageDayTimeDuration),
+      averageNightTimeDuration: formatDuration(averageNightTimeDuration),
+      averageTotalDuration: formatDuration(averageTotalDuration),
+      averageInterval: formatDuration(averageInterval),
+    };
+  }
 }
