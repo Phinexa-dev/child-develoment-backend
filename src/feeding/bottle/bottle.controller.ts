@@ -110,4 +110,16 @@ export class BottleController {
     }
     return this.bottleService.remove(recID, parent.parentId);
   }
+
+  @Get('summary/:childId')
+  @UseGuards(JwtAuthGuard)
+  summary(
+    @Param('childId') childId: string,
+    @CurrentUser() parent: Parent) {
+    const childID = parseInt(childId, 10)
+    if (isNaN(childID)) {
+      throw new BadRequestException('Invalid childId format.');
+    }
+    return this.bottleService.summary(parent.parentId, +childId);
+  }
 }

@@ -130,16 +130,16 @@ export class BottleService {
 
       if (updateBottleDto.milkTypeId) {
         const milkTypeExists = await this.databaseService.milkType.findUnique({
-          where: { 
+          where: {
             typeID: updateBottleDto.milkTypeId,
-            isDeleted:false
-           },
+            isDeleted: false
+          },
         });
         if (!milkTypeExists) {
           throw new BadRequestException('Invalid milkType: Milk type does not exist.');
         }
       }
-      
+
       return this.databaseService.bottle.update({
         where: { id },
         data: {
@@ -197,4 +197,48 @@ export class BottleService {
       throw new BadRequestException(e.message || e);
     }
   }
+
+  async summary(parentId: number, childId: number) {
+    await this.verifyParentChildRelation(parentId, childId);
+
+    const records = await this.databaseService.bottle.findMany({
+      where: {
+        childId: childId,
+        isDeleted: false,
+      },
+      select: {
+        stash: true,
+        date: true,
+        volume: true,
+      },
+      orderBy: {
+        date: 'asc',
+      },
+      take: 20,
+    });
+
+    if (records.length === 0) {
+      throw new NotFoundException('No bottle records found for this child.');
+    }
+
+    const volumes = records.map(record => record.volume || 0);
+
+    const totalVolume = volumes.reduce((sum, volume) => sum + volume, 0);
+    const averageVolume = totalVolume / volumes.length;
+
+    const minVolume = Math.min(...volumes);
+    const maxVolume = Math.max(...volumes);
+
+    const startingDate = records[0].date;
+    const endingDate = records[records.length - 1].date;
+
+    return {
+      startingDate,
+      endingDate,
+      minVolume: parseFloat(minVolume.toFixed(2)),
+      maxVolume: parseFloat(maxVolume.toFixed(2)),
+      averageVolume: parseFloat(averageVolume.toFixed(2)),
+    };
+  }
+
 }

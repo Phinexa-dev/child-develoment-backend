@@ -70,7 +70,7 @@ export class GrowthController {
       throw new BadRequestException('Offset must be a non-negative integer.');
     }
 
-    return this.growthService.findAll(parent.parentId, childID,limitNum,offsetNum)
+    return this.growthService.findAll(parent.parentId, childID, limitNum, offsetNum)
 
   }
 
@@ -96,7 +96,7 @@ export class GrowthController {
     }
     return this.growthService.updateGrowthRecord(parent.parentId, ID, updateGrowthDto);
   }
-  
+
   @Get('/delete/:id')
   @UseGuards(JwtAuthGuard)
   async deleteGrowth(
@@ -108,5 +108,31 @@ export class GrowthController {
       throw new BadRequestException('Invalid Id format.');
     }
     return this.growthService.deleteGrowthRecord(parent.parentId, ID);
+  }
+
+  @Get('summary/:childId')
+  @UseGuards(JwtAuthGuard)
+  async summary(
+    @Param('childId') childId,
+    @CurrentUser() parent: Parent,
+  ) {
+    const childID = parseInt(childId, 10)
+    if (isNaN(childID)) {
+      throw new BadRequestException('Invalid childId format.');
+    }
+    return this.growthService.summary(parent.parentId, childID);
+  }
+
+  @Get('data/:childId')
+  @UseGuards(JwtAuthGuard)
+  async data(
+    @Param('childId') childId,
+    @CurrentUser() parent: Parent,
+  ) {
+    const childID = parseInt(childId, 10)
+    if (isNaN(childID)) {
+      throw new BadRequestException('Invalid childId format.');
+    }
+    return this.growthService.dataPoints(parent.parentId, childID);
   }
 }

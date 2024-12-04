@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateNurseDto } from './dto/create-nurse-dto';
 import { UpdateNurseDto } from './dto/update-nurse-dto';
+import { subMonths } from 'date-fns';
 
 @Injectable()
 export class NurseService {
@@ -61,14 +62,14 @@ export class NurseService {
           childId: childId,
           isDeleted: false,
         },
-        select:{
-          id:true,
-          childId:true,
-          startingTime:true,
-          endingTime:true,
-          leftDuration:true,
-          rightDuration:true,
-          notes:true,
+        select: {
+          id: true,
+          childId: true,
+          startingTime: true,
+          endingTime: true,
+          leftDuration: true,
+          rightDuration: true,
+          notes: true,
         },
         take: limit,
         skip: offset,
@@ -160,5 +161,44 @@ export class NurseService {
     } catch (e) {
       throw new BadRequestException(e.message || e);
     }
+  }
+
+  async summary(parentId: number, childId: number) {
+    await this.verifyParentChildRelation(parentId, childId);
+
+    const records = await this.databaseService.nursing.findMany({
+      where: {
+        childId: childId,
+        isDeleted: false,
+      },
+      select: {
+        startingTime: true,
+        leftDuration: true,
+        rightDuration: true,
+      },
+      orderBy: {
+        startingTime: 'asc',
+      },
+      take: 20,
+    });
+
+    if (records.length === 0) {
+      throw new NotFoundException('No nursing records found for this child.');
+    }
+
+    const durations = records.map(record => (record.leftDuration || 0) + (record.rightDuration || 0));
+    const endingDate = records[records.length - 1].startingTime.toISOString().split('T')[0];
+    const startingDate = records[0].startingTime.toISOString().split('T')[0];
+    const minimumDuration = Math.min(...durations);
+    const maximumDuration = Math.max(...durations);
+    const averageDuration = durations.reduce((sum, duration) => sum + duration, 0) / durations.length;
+
+    return {
+      startingDate,
+      endingDate,
+      minimumDuration,
+      maximumDuration,
+      averageDuration: parseFloat(averageDuration.toFixed(2)),
+    };
   }
 }

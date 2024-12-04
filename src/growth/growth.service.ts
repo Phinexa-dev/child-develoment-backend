@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException, UnauthorizedExcepti
 import { DatabaseService } from 'src/database/database.service';
 import { CreateGrowthDto } from './dto/create-growth-dto';
 import { UpdateGrowthDto } from './dto/update-growth-dto';
+import { differenceInMonths, subMonths } from 'date-fns';
 
 
 @Injectable()
@@ -147,5 +148,66 @@ export class GrowthService {
       where: { id: growthId },
       data: { isDeleted: true }
     });
+  }
+
+  async summary(parentId: number, childId: number) {
+
+    await this.verifyParentChildRelation(parentId, childId);
+
+    const records = await this.databaseService.growth.findMany({
+      where: {
+        childId: childId,
+        date: {
+          gte: subMonths(new Date(), 3),
+        },
+        isDeleted: false
+      },
+      select: {
+        height: true,
+        weight: true,
+      },
+    });
+
+    const heightTotal = records.reduce((sum, record) => sum + (record.height || 0), 0);
+    const weightTotal = records.reduce((sum, record) => sum + (record.weight || 0), 0);
+
+    return {
+      heightTotal,
+      weightTotal,
+    };
+  }
+
+  async dataPoints(parentId: number, childId: number) {
+    await this.verifyParentChildRelation(parentId, childId);
+
+    const child = await this.databaseService.child.findUnique({
+      where: { childId },
+      select: { birthday: true },
+    });
+
+    const birthday = child.birthday;
+
+    const growthRecords = await this.databaseService.growth.findMany({
+      where: {
+        childId,
+        isDeleted: false,
+      },
+      select: {
+        height: true,
+        weight: true,
+        date: true,
+      },
+      orderBy: {
+        date: 'asc',
+      },
+    });
+
+    const dataPoints = growthRecords.map(record => ({
+      months: differenceInMonths(new Date(record.date), new Date(birthday)),
+      height: record.height || null,
+      weight: record.weight || null,
+    }));
+
+    return dataPoints;
   }
 }

@@ -96,4 +96,16 @@ export class NurseController {
     @CurrentUser() parent: Parent) {
     return this.nurseService.remove(+id, parent.parentId);
   }
+
+  @Get('summary/:childId')
+  @UseGuards(JwtAuthGuard)
+  summary(
+    @Param('childId') childId: string,
+    @CurrentUser() parent: Parent) {
+    const childID = parseInt(childId, 10)
+    if (isNaN(childID)) {
+      throw new BadRequestException('Invalid childId format.');
+    }
+    return this.nurseService.summary(parent.parentId, +childId);
+  }
 }
