@@ -23,18 +23,18 @@ export class VaccinationService {
 
   async create(createVaccinationDto: CreateVaccinationDto, parentId: number) {
     const { symptomIds, childId, vaccineId, images, ...vaccinationData } = createVaccinationDto;
-  
+
     await this.verifyParentChildRelation(parentId, childId);
-  
+
     const childConnection = {
       connect: { childId: childId },
     };
-  
+
     const child = await this.databaseService.child.findUnique({
       where: { childId: childId },
       select: { region: true },
     });
-  
+
     const vaccine = await this.databaseService.vaccine.findUnique({
       where: {
         id: vaccineId,
@@ -42,40 +42,40 @@ export class VaccinationService {
         region: { equals: child?.region, mode: 'insensitive' },
       },
     });
-  
+
     if (!vaccine) {
       throw new NotFoundException('Vaccine not found or does not match child’s region');
     }
-  
+
     const vaccineConnection = vaccineId ? { connect: { id: vaccineId } } : undefined;
-  
+
     let symptomConnections;
     if (symptomIds && symptomIds.length > 0) {
       const existingSymptoms = await this.databaseService.symptom.findMany({
         where: { id: { in: symptomIds }, isDeleted: false },
         select: { id: true },
       });
-  
+
       const existingSymptomIds = existingSymptoms.map(symptom => symptom.id);
       const missingIds = symptomIds.filter(id => !existingSymptomIds.includes(id));
-  
+
       if (missingIds.length > 0) {
         throw new NotFoundException(`Symptoms with IDs ${missingIds.join(', ')} do not exist.`);
       }
-  
+
       symptomConnections = {
         create: symptomIds.map(id => ({
           symptom: { connect: { id } },
         })),
       };
     }
-  
+
     const imageConnections = images
       ? images.map(url => ({
-          image: url,
-        }))
+        image: url,
+      }))
       : [];
-  
+
     const data: Prisma.VaccinationCreateInput = {
       ...vaccinationData,
       child: childConnection,
@@ -85,31 +85,59 @@ export class VaccinationService {
         create: imageConnections,
       },
     };
-  
+
     return this.databaseService.vaccination.create({ data });
   }
-  
+
 
   async findAll(parentId: number, childId: number) {
-    await this.verifyParentChildRelation(parentId, childId)
+    await this.verifyParentChildRelation(parentId, childId);
+
     return await this.databaseService.vaccination.findMany({
       where: {
         childId,
-        isDeleted: false
+        isDeleted: false,
       },
-      include: { symptoms: { include: { symptom: true } } },
+      select: {
+        id: true,
+        childId: true,
+        vaccineId: true,
+        status: true,
+        date: true,
+        venue: true,
+        notes: true,
+        country: true,
+        symptoms: {
+          select: {
+            symptom: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        images: {
+          select: {
+            id: true,
+            image: true,
+          },
+        },
+      },
       orderBy: {
-        date: 'asc'
-      }
+        date: 'asc',
+      },
     });
   }
+
+
   findOne(id: number) {
     return `This action returns a #${id} vaccination`;
   }
 
   async update(id: number, updateVaccinationDto: UpdateVaccinationDto, parentId: number) {
     const { symptomIds, images = [], ...vaccinationData } = updateVaccinationDto;
-  
+
     const existingVaccination = await this.databaseService.vaccination.findUnique({
       where: { id },
       include: {
@@ -118,18 +146,18 @@ export class VaccinationService {
         images: { select: { id: true, image: true, isDeleted: true } },
       },
     });
-  
+
     if (!existingVaccination || existingVaccination.isDeleted) {
       throw new NotFoundException(`Vaccination with ID ${id} not found`);
     }
-  
+
     await this.verifyParentChildRelation(parentId, existingVaccination.childId);
-  
+
     if (symptomIds && symptomIds.length > 0) {
       const existingSymptomIds = existingVaccination.symptoms.map(s => s.symptomId);
       const symptomsToDelete = existingSymptomIds.filter(id => !symptomIds.includes(id));
       const symptomsToAdd = symptomIds.filter(id => !existingSymptomIds.includes(id));
-  
+
       await this.databaseService.postSymptom.updateMany({
         where: {
           vaccinationId: id,
@@ -137,7 +165,7 @@ export class VaccinationService {
         },
         data: { isDeleted: true },
       });
-  
+
       await Promise.all(
         symptomsToAdd.map(symptomId =>
           this.databaseService.postSymptom.create({
@@ -154,14 +182,14 @@ export class VaccinationService {
         data: { isDeleted: true },
       });
     }
-  
+
     if (images.length > 0) {
       const existingImageUrls = existingVaccination.images
         .filter(img => !img.isDeleted)
         .map(img => img.image);
       const imagesToDelete = existingImageUrls.filter(url => !images.includes(url));
       const imagesToAdd = images.filter(url => !existingImageUrls.includes(url));
-  
+
       await this.databaseService.vaccinationImages.updateMany({
         where: {
           vaccinationId: id,
@@ -169,7 +197,7 @@ export class VaccinationService {
         },
         data: { isDeleted: true },
       });
-  
+
       await Promise.all(
         imagesToAdd.map(url =>
           this.databaseService.vaccinationImages.create({
@@ -186,18 +214,18 @@ export class VaccinationService {
         data: { isDeleted: true },
       });
     }
-  
+
     const data: Prisma.VaccinationUpdateInput = {
       ...vaccinationData,
     };
-  
+
     return this.databaseService.vaccination.update({
       where: { id },
       data,
     });
   }
-  
-  
+
+
   async remove(id: number, parentId: number) {
     const vaccination = await this.databaseService.vaccination.findUnique({ where: { id, isDeleted: false } });
     if (!vaccination) {

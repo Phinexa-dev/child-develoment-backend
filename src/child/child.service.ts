@@ -6,7 +6,7 @@ import { DatabaseService } from 'src/database/database.service';
 @Injectable()
 export class ChildService {
 
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly databaseService: DatabaseService) { }
 
   async create(createChildDto: Prisma.ChildCreateInput, parentId: number) {
 
@@ -25,6 +25,30 @@ export class ChildService {
       },
     });
 
+    const vaccines = await this.databaseService.vaccine.findMany({
+      where: {
+        region: {
+          equals: child.region,
+          mode: 'insensitive'
+        },
+        isDeleted: false,
+      },
+    });
+
+    const vaccinationData = vaccines.map(vaccine => {
+      const vaccinationDate = new Date(child.birthday);
+      vaccinationDate.setMonth(vaccinationDate.getMonth() + vaccine.ageInMonths);
+      return {
+        childId: child.childId,
+        vaccineId: vaccine.id,
+        date: vaccinationDate,
+      };
+    });
+
+    await this.databaseService.vaccination.createMany({
+      data: vaccinationData
+    });
+
     return child;
   }
 
@@ -38,7 +62,7 @@ export class ChildService {
         child: true, // Include the child details in the response
       },
     });
-    
+
     // Extracting the child details
     const children = activeChildren.map(relation => relation.child);
     return children;
@@ -90,8 +114,8 @@ export class ChildService {
   async remove(id: number, parentId: number): Promise<void> {
     // Find the child and include the parent association
     const child = await this.databaseService.child.findUnique({
-      where: { childId:id },
-      include: { parents: true }, 
+      where: { childId: id },
+      include: { parents: true },
     });
     // Check if the child exists
     if (!child) {
@@ -104,7 +128,7 @@ export class ChildService {
     }
     // Delete the child
     await this.databaseService.child.delete({
-      where: { childId:id },
+      where: { childId: id },
     });
 
     return;
