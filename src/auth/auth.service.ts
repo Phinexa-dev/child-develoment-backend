@@ -6,13 +6,15 @@ import { JwtService } from '@nestjs/jwt';
 import { Parent } from '@prisma/client';
 import { TokenPayload } from './token-payload.interface';
 import { Response } from 'express';
+import { DatabaseService } from 'src/database/database.service';
 
 
 @Injectable()
 export class AuthService {
     constructor(private readonly parentService: ParentService,
         private readonly configService: ConfigService,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly databaseService: DatabaseService
     ) { }
 
     async login(parent: Parent, response: Response) {
@@ -39,6 +41,29 @@ export class AuthService {
 
         response.cookie('Authentication', accessToken, { httpOnly: true, secure: false, expires: expireAccessToken, }) //cahnge to true in production
         response.cookie('Refresh', refreshToken, { httpOnly: true, secure: false, expires: expireRefreshToken, }) //cahnge to true in production
+
+        const children = await this.databaseService.parentChild.findMany({
+            where: {
+                parentId: parent.parentId,
+                status: 'Active',
+            },
+            include: {
+                child: {
+                    select: {
+                        childId: true,
+                        firstName: true,
+                        lastName: true,
+                    },
+                },
+            },
+        });
+
+        const childDetails = children.map(child => ({
+            childId: child.child.childId,
+            firstName: child.child.firstName,
+            lastName: child.child.lastName,
+        }));
+        response.json(childDetails)
     }
 
     async verifyUser(email: string, password: string) {
