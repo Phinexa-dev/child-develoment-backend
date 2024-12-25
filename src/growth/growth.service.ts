@@ -157,24 +157,16 @@ export class GrowthService {
     const records = await this.databaseService.growth.findMany({
       where: {
         childId: childId,
-        date: {
-          gte: subMonths(new Date(), 3),
-        },
         isDeleted: false
       },
       select: {
         height: true,
         weight: true,
+        date: true
       },
     });
 
-    const heightTotal = records.reduce((sum, record) => sum + (record.height || 0), 0);
-    const weightTotal = records.reduce((sum, record) => sum + (record.weight || 0), 0);
-
-    return {
-      heightTotal,
-      weightTotal,
-    };
+    return records;
   }
 
   async dataPoints(parentId: number, childId: number) {
@@ -210,4 +202,112 @@ export class GrowthService {
 
     return dataPoints;
   }
+
+  async summaryHeight(parentId: number, childId: number) {
+    await this.verifyParentChildRelation(parentId, childId);
+  
+    const records = await this.databaseService.growth.findMany({
+      where: {
+        childId: childId,
+        isDeleted: false,
+        height: { not: null },
+      },
+      select: {
+        height: true,
+        date: true,
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+  
+    if (records.length === 0) {
+      throw new NotFoundException("No height records found for this child.");
+    }
+  
+    const lastRecord = records[0];
+  
+    const filteredRecords = records.filter(record => {
+      const lastRecordMonth = new Date(lastRecord.date).getMonth();
+      const lastRecordYear = new Date(lastRecord.date).getFullYear();
+  
+      const recordMonth = new Date(record.date).getMonth();
+      const recordYear = new Date(record.date).getFullYear();
+  
+      return !(recordMonth === lastRecordMonth && recordYear === lastRecordYear);
+    });
+  
+    let heightGrowth = null;
+    let monthsDifference = null;
+  
+    if (filteredRecords.length > 0) {
+      const nearestRecord = filteredRecords[0];
+      heightGrowth = lastRecord.height - nearestRecord.height;
+  
+      const exactDifference = new Date(lastRecord.date).getTime() - new Date(nearestRecord.date).getTime();
+      monthsDifference = Math.round(exactDifference / (1000 * 60 * 60 * 24 * 30)); 
+    }
+  
+    return {
+      lastRecord: lastRecord.height,
+      lastRecordDate: lastRecord.date,
+      heightGrowth: heightGrowth !== null ? parseFloat(heightGrowth.toFixed(2)) : null,
+      monthsDifference: monthsDifference !== null ? monthsDifference : null,
+    };
+  }
+
+  async summaryWeight(parentId: number, childId: number) {
+    await this.verifyParentChildRelation(parentId, childId);
+  
+    const records = await this.databaseService.growth.findMany({
+      where: {
+        childId: childId,
+        isDeleted: false,
+      },
+      select: {
+        weight: true,
+        date: true,
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+  
+    if (records.length === 0) {
+      throw new NotFoundException("No growth records found for this child.");
+    }
+  
+    const lastRecord = records[0];
+  
+    const filteredRecords = records.filter(record => {
+      const lastRecordMonth = new Date(lastRecord.date).getMonth();
+      const lastRecordYear = new Date(lastRecord.date).getFullYear();
+  
+      const recordMonth = new Date(record.date).getMonth();
+      const recordYear = new Date(record.date).getFullYear();
+  
+      return !(recordMonth === lastRecordMonth && recordYear === lastRecordYear);
+    });
+  
+    let weightGrowth = null;
+    let monthsDifference = null;
+  
+    if (filteredRecords.length > 0) {
+      const nearestRecord = filteredRecords[0];
+      if (lastRecord.weight !== null && nearestRecord.weight !== null) {
+        weightGrowth = lastRecord.weight - nearestRecord.weight;
+      }
+  
+      const exactDifference = new Date(lastRecord.date).getTime() - new Date(nearestRecord.date).getTime();
+      monthsDifference = Math.round(exactDifference / (1000 * 60 * 60 * 24 * 30)); // Approximation of a month
+    }
+  
+    return {
+      lastRecord: lastRecord.weight,
+      lastRecordDate: lastRecord.date,
+      weightGrowth: weightGrowth !== null ? parseFloat(weightGrowth.toFixed(2)) : null,
+      monthsDifference: monthsDifference !== null ? monthsDifference : null,
+    };
+  }
+  
 }
