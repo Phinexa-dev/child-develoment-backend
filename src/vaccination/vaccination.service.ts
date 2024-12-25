@@ -93,7 +93,7 @@ export class VaccinationService {
   async findAll(parentId: number, childId: number) {
     await this.verifyParentChildRelation(parentId, childId);
 
-    return await this.databaseService.vaccination.findMany({
+    const vaccinations = await this.databaseService.vaccination.findMany({
       where: {
         childId,
         isDeleted: false,
@@ -112,7 +112,6 @@ export class VaccinationService {
             symptom: {
               select: {
                 id: true,
-                name: true,
               },
             },
           },
@@ -128,6 +127,10 @@ export class VaccinationService {
         date: 'asc',
       },
     });
+    return vaccinations.map(vaccination => ({
+      ...vaccination,
+      symptoms: vaccination.symptoms.map(s => s.symptom.id),
+    }));
   }
 
 
@@ -157,7 +160,6 @@ export class VaccinationService {
       const existingSymptomIds = existingVaccination.symptoms.map(s => s.symptomId);
       const symptomsToDelete = existingSymptomIds.filter(id => !symptomIds.includes(id));
       const symptomsToAdd = symptomIds.filter(id => !existingSymptomIds.includes(id));
-
       await this.databaseService.postSymptom.updateMany({
         where: {
           vaccinationId: id,
@@ -215,16 +217,37 @@ export class VaccinationService {
       });
     }
 
-    const data: Prisma.VaccinationUpdateInput = {
-      ...vaccinationData,
+    const updatedVaccination = await this.databaseService.vaccination.update({
+      where: { id },
+      data: vaccinationData,
+      include: {
+        symptoms: {
+          select: {
+            symptom: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+        images: {
+          select: {
+            id: true,
+            image: true,
+            isDeleted: true
+          },
+        },
+      },
+    });
+
+    const transformedVaccination = {
+      ...updatedVaccination,
+      symptoms: updatedVaccination.symptoms.map(s => s.symptom.id),
     };
 
-    return this.databaseService.vaccination.update({
-      where: { id },
-      data,
-    });
-  }
 
+    return transformedVaccination;
+  }
 
   async remove(id: number, parentId: number) {
     const vaccination = await this.databaseService.vaccination.findUnique({ where: { id, isDeleted: false } });
