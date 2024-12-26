@@ -1,4 +1,4 @@
-import { BadRequestException, ConsoleLogger, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConsoleLogger, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { hash } from 'bcryptjs'
 import { DatabaseService } from 'src/database/database.service';
@@ -46,7 +46,7 @@ export class ParentService {
   }
 
   async findAll() {
-     return  await this.databaseService.parent.findMany({})
+    return await this.databaseService.parent.findMany({})
   }
 
   async findOne(parentId: number) {
@@ -82,5 +82,33 @@ export class ParentService {
       throw new NotFoundException("User not found")
     }
     return parent;
+  }
+
+  async findMyAccount(parentId: number) {
+    return this.databaseService.parent.findUnique({
+      where: {
+        parentId,
+      },
+      select: {
+        parentId: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        image: true,
+        bloodGroup: true,
+        phoneNumber: true,
+        address: true
+      }
+    })
+  }
+
+  async UpdateMyAccount(parentId: number, updateParentDto: Prisma.ParentUpdateInput, parentTokenId: number) {
+    if (parentId != parentTokenId) return new UnauthorizedException ();
+    return this.databaseService.parent.update({
+      where: {
+        parentId,
+      },
+      data: updateParentDto,
+    })
   }
 }

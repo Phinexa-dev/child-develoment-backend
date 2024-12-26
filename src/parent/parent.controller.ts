@@ -6,7 +6,7 @@ import { CurrentUser } from 'src/auth/current-user.decorator';
 
 @Controller('parent')
 export class ParentController {
-  constructor(private readonly parentService: ParentService) {}
+  constructor(private readonly parentService: ParentService) { }
 
   // @Post()
   // async create(@Body() createParentDto: Prisma.ParentCreateInput) {
@@ -14,9 +14,9 @@ export class ParentController {
   // }
 
   @Get()
-  @UseGuards(JwtAuthGuard) 
+  @UseGuards(JwtAuthGuard)
   async findAll(@CurrentUser() parent: Parent) {
-    return this.parentService.findAll();
+    return this.parentService.findMyAccount(parent.parentId);
   }
 
   @Get(':id')
@@ -24,12 +24,13 @@ export class ParentController {
     return this.parentService.findOne(+id);
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateParentDto: Prisma.ParentUpdateInput) {
-    return this.parentService.update(+id, updateParentDto);
+  @Post(':id')
+  @UseGuards(JwtAuthGuard)
+  async update(@CurrentUser() parent: Parent, @Param('id') id: string, @Body() updateParentDto: Prisma.ParentUpdateInput,) {
+    return this.parentService.UpdateMyAccount(+id, updateParentDto,parent.parentId);
   }
 
-  @Delete(':id')
+  @Get('delete/:id')
   async remove(@Param('id') id: string) {
     return this.parentService.remove(+id);
   }
