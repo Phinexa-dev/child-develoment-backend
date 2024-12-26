@@ -34,6 +34,30 @@ export class ChildService {
       },
     });
 
+    const vaccines = await this.databaseService.vaccine.findMany({
+      where: {
+        region: {
+          equals: child.region,
+          mode: 'insensitive'
+        },
+        isDeleted: false,
+      },
+    });
+
+    const vaccinationData = vaccines.map(vaccine => {
+      const vaccinationDate = new Date(child.birthday);
+      vaccinationDate.setMonth(vaccinationDate.getMonth() + vaccine.ageInMonths);
+      return {
+        childId: child.childId,
+        vaccineId: vaccine.id,
+        date: vaccinationDate,
+      };
+    });
+
+    await this.databaseService.vaccination.createMany({
+      data: vaccinationData
+    });
+
     return child;
   }
 

@@ -366,8 +366,10 @@ model Vaccination {
   childId   Int
   vaccineId Int // Optional foreign key to Vaccine
   date      DateTime
-  venue     String
+  venue     String?
   notes     String?
+  country   String?
+  status    String @default("not taken")
   isDeleted Boolean  @default(false)
 
   // Relations

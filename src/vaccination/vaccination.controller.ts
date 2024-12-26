@@ -38,7 +38,7 @@ export class VaccinationController {
     return this.vaccinationService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Post(':id')
   @UseGuards(JwtAuthGuard)
   update(
     @Param('id') id: string,

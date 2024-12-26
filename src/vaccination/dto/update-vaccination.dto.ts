@@ -16,6 +16,10 @@ export class UpdateVaccinationDto {
     notes?: string;
 
     @IsOptional()
+    @IsString()
+    country?: string;
+
+    @IsOptional()
     @IsArray()
     @IsInt({ each: true })
     symptomIds?: number[];
