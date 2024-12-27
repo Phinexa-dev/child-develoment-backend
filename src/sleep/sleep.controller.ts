@@ -4,31 +4,20 @@ import { Parent, Prisma } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { isValid, parseISO } from 'date-fns';
+import { CreateSleepDto } from './dto/create-sleep-dto';
 
 
 @Controller('sleep')
 export class SleepController {
   constructor(private readonly sleepService: SleepService) { }
 
-  @Post('child/:childId')
+  @Post()
   @UseGuards(JwtAuthGuard)
   async create(
-    @Body() createSleepDto: Prisma.SleepCreateInput,
+    @Body() createSleepDto: CreateSleepDto,
     @CurrentUser() parent: Parent,
-    @Param('childId') childId: string,
-  ) {
-    const childIdNumber = parseInt(childId, 10);
 
-    if (isNaN(childIdNumber)) {
-      throw new BadRequestException('Invalid childId format.');
-    }
-    if (!createSleepDto.child) {
-      createSleepDto.child = {
-        connect: { childId: childIdNumber },
-      };
-    } else {
-      createSleepDto.child.connect = { childId: childIdNumber };
-    }
+  ) {
     return this.sleepService.create(createSleepDto, parent.parentId);
   }
 
@@ -55,21 +44,33 @@ export class SleepController {
     return this.sleepService.getSleepRecordsBetweenDates(parent.parentId, childIdNumber, startDate, endDate);
   }
 
-  @Get('child/:childId')
+  @Get(':childId')
   @UseGuards(JwtAuthGuard)
   async getAllSleepRecords(
     @Param('childId') childId: string,
     @CurrentUser() parent: Parent,
+    @Query('limit') limit: string = '10', // Default limit
+    @Query('offset') offset: string = '0' // Default offset
   ) {
     const childID = parseInt(childId, 10);
 
     if (isNaN(childID)) {
       throw new BadRequestException('Invalid childId format.');
     }
-    return this.sleepService.findAll(parent.parentId, childID);
+    const limitNum = parseInt(limit, 10);
+    const offsetNum = parseInt(offset, 10);
+
+    if (isNaN(limitNum) || limitNum <= 0) {
+      throw new BadRequestException('Limit must be a positive integer.');
+    }
+
+    if (isNaN(offsetNum) || offsetNum < 0) {
+      throw new BadRequestException('Offset must be a non-negative integer.');
+    }
+    return this.sleepService.findAll(parent.parentId, childID, limitNum, offsetNum);
   }
 
-  @Patch(':id')
+  @Post(':id')
   @UseGuards(JwtAuthGuard)
   async updateSleepRecord(
     @Param('id') id: string,
@@ -83,7 +84,7 @@ export class SleepController {
     return this.sleepService.updateSleepRecord(parent.parentId, ID, updateSleepDto);
   }
 
-  @Delete(':id')
+  @Get('delete/:id')
   @UseGuards(JwtAuthGuard)
   async deleteSleepRecord(
     @Param('id') id: string,

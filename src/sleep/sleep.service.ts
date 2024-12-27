@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { isDataURI } from 'class-validator';
+import { off } from 'process';
 import { DatabaseService } from 'src/database/database.service';
+import { CreateSleepDto } from './dto/create-sleep-dto';
 
 
 @Injectable()
@@ -22,9 +24,9 @@ export class SleepService {
     }
   }
 
-  async create(createSleepDto: Prisma.SleepCreateInput, parentId: number) {
+  async create(createSleepDto: CreateSleepDto, parentId: number) {
 
-    await this.verifyParentChildRelation(parentId, createSleepDto.child.connect.childId);
+    await this.verifyParentChildRelation(parentId, createSleepDto.childId);
 
     return this.databaseService.sleep.create({
       data: {
@@ -34,7 +36,7 @@ export class SleepService {
         note: createSleepDto.note,
         sleepStyle: createSleepDto.sleepStyle,
         child: {
-          connect: { childId: createSleepDto.child.connect.childId },
+          connect: { childId: createSleepDto.childId },
         },
       },
     });
@@ -55,7 +57,7 @@ export class SleepService {
     });
   }
 
-  async findAll(parentId: number, childId: number) {
+  async findAll(parentId: number, childId: number, limit: number, offset: number) {
     await this.verifyParentChildRelation(parentId, childId);
 
     return this.databaseService.sleep.findMany({
@@ -63,6 +65,17 @@ export class SleepService {
         childId: childId,
         isDeleted: false
       },
+      select: {
+        sleepId: true,
+        childId: true,
+        date: true,
+        startTime: true,
+        duration: true,
+        note: true,
+        sleepStyle: true,
+      },
+      take: limit,
+      skip: offset
     });
   }
 
