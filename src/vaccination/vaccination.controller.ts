@@ -1,10 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, BadRequestException, UseInterceptors, ParseIntPipe, UploadedFiles } from '@nestjs/common';
 import { VaccinationService } from './vaccination.service';
 import { CreateVaccinationDto } from './dto/create-vaccination.dto';
 import { UpdateVaccinationDto } from './dto/update-vaccination.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { Parent } from '@prisma/client';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import type { Express } from 'express';
+
 
 @Controller('vaccination')
 export class VaccinationController {
@@ -39,12 +43,39 @@ export class VaccinationController {
   }
 
   @Post(':id')
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [{ name: 'images', maxCount: 10 }],
+      {
+        storage: diskStorage({
+          destination: './uploads', //
+          filename: (req, file, cb) => {
+            const uniqueName = `${Date.now()}-${file.originalname}`;
+            cb(null, uniqueName);
+          },
+        }),
+        fileFilter: (req, file, cb) => {
+          const allowedMimeTypes = ['image/jpeg', 'image/png'];
+          if (allowedMimeTypes.includes(file.mimetype)) {
+            cb(null, true);
+          } else {
+            cb(new BadRequestException('Invalid file type'), false);
+          }
+        },
+      },
+    ),
+  )
   @UseGuards(JwtAuthGuard)
-  update(
-    @Param('id') id: string,
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateVaccinationDto: UpdateVaccinationDto,
+    @UploadedFiles() files: { images?: Express.Multer.File[] },
     @CurrentUser() parent: Parent,
-    @Body() updateVaccinationDto: UpdateVaccinationDto) {
-    return this.vaccinationService.update(+id, updateVaccinationDto, parent.parentId);
+  ) {
+    
+    const imagePaths = files?.images?.map(file => file.filename) || [];
+
+    return this.vaccinationService.update(id, { ...updateVaccinationDto, images: imagePaths }, parent.parentId);
   }
 
   @Delete(':id')
@@ -56,3 +87,5 @@ export class VaccinationController {
     return this.vaccinationService.remove(+id, parent.parentId);
   }
 }
+
+

@@ -3,10 +3,12 @@ import { CreateVaccinationDto } from './dto/create-vaccination.dto';
 import { UpdateVaccinationDto } from './dto/update-vaccination.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class VaccinationService {
-  constructor(private readonly databaseService: DatabaseService) { }
+  constructor(private readonly databaseService: DatabaseService,
+    private readonly configService: ConfigService) { }
 
   private async verifyParentChildRelation(parentId: number, childId: number) {
     const parentChildRelation = await this.databaseService.parentChild.findFirst({
@@ -108,6 +110,9 @@ export class VaccinationService {
         notes: true,
         country: true,
         symptoms: {
+          where: {
+            isDeleted: false,
+          },
           select: {
             symptom: {
               select: {
@@ -117,6 +122,9 @@ export class VaccinationService {
           },
         },
         images: {
+          where: {
+            isDeleted: false,
+          },
           select: {
             id: true,
             image: true,
@@ -127,9 +135,16 @@ export class VaccinationService {
         date: 'asc',
       },
     });
+
+    const baseUrl = this.configService.getOrThrow('ENV')
+
     return vaccinations.map(vaccination => ({
       ...vaccination,
       symptoms: vaccination.symptoms.map(s => s.symptom.id),
+      images: vaccination.images.map(image => ({
+        ...image,
+        image: `${baseUrl}/${image.image}`,
+      })),
     }));
   }
 
@@ -145,7 +160,12 @@ export class VaccinationService {
       where: { id },
       include: {
         child: true,
-        symptoms: { select: { symptomId: true, id: true } },
+        symptoms: {
+          where: {
+            isDeleted: false
+          },
+          select: { symptomId: true, id: true }
+        },
         images: { select: { id: true, image: true, isDeleted: true } },
       },
     });
@@ -156,10 +176,20 @@ export class VaccinationService {
 
     await this.verifyParentChildRelation(parentId, existingVaccination.childId);
 
-    if (symptomIds && symptomIds.length > 0) {
+    if (symptomIds) {
+
+      const symptomIdsInt = symptomIds.map(id => {
+        const parsedId = parseInt(id as any, 10); // Explicit conversion
+        if (isNaN(parsedId)) {
+          throw new BadRequestException(`Invalid symptom ID: ${id}`);
+        }
+        return parsedId;
+      });
+
       const existingSymptomIds = existingVaccination.symptoms.map(s => s.symptomId);
-      const symptomsToDelete = existingSymptomIds.filter(id => !symptomIds.includes(id));
-      const symptomsToAdd = symptomIds.filter(id => !existingSymptomIds.includes(id));
+      const symptomsToDelete = existingSymptomIds.filter(id => !symptomIdsInt.includes(id));
+      const symptomsToAdd = symptomIdsInt.filter(id => !existingSymptomIds.includes(id));
+
       await this.databaseService.postSymptom.updateMany({
         where: {
           vaccinationId: id,
@@ -173,10 +203,10 @@ export class VaccinationService {
           this.databaseService.postSymptom.create({
             data: {
               vaccinationId: id,
-              symptomId: symptomId,
+              symptomId,
             },
-          })
-        )
+          }),
+        ),
       );
     } else if (symptomIds && symptomIds.length === 0) {
       await this.databaseService.postSymptom.updateMany({
@@ -184,13 +214,11 @@ export class VaccinationService {
         data: { isDeleted: true },
       });
     }
-
+    console.log(images)
     if (images.length > 0) {
-      const existingImageUrls = existingVaccination.images
-        .filter(img => !img.isDeleted)
-        .map(img => img.image);
-      const imagesToDelete = existingImageUrls.filter(url => !images.includes(url));
-      const imagesToAdd = images.filter(url => !existingImageUrls.includes(url));
+      const existingImages = existingVaccination.images.filter(img => !img.isDeleted).map(img => img.image);
+      const imagesToDelete = existingImages.filter(image => !images.includes(image));
+      const imagesToAdd = images.filter(image => !existingImages.includes(image));
 
       await this.databaseService.vaccinationImages.updateMany({
         where: {
@@ -201,15 +229,16 @@ export class VaccinationService {
       });
 
       await Promise.all(
-        imagesToAdd.map(url =>
+        imagesToAdd.map(image =>
           this.databaseService.vaccinationImages.create({
             data: {
               vaccinationId: id,
-              image: url,
+              image,
             },
-          })
-        )
+          }),
+        ),
       );
+
     } else if (images && images.length === 0) {
       await this.databaseService.vaccinationImages.updateMany({
         where: { vaccinationId: id },
@@ -222,6 +251,7 @@ export class VaccinationService {
       data: vaccinationData,
       include: {
         symptoms: {
+          where: { isDeleted: false },
           select: {
             symptom: {
               select: {
@@ -231,23 +261,27 @@ export class VaccinationService {
           },
         },
         images: {
+          where: { isDeleted: false },
           select: {
             id: true,
             image: true,
-            isDeleted: true
           },
         },
       },
     });
 
-    const transformedVaccination = {
+    const baseUrl = this.configService.getOrThrow('ENV')
+
+    return {
       ...updatedVaccination,
       symptoms: updatedVaccination.symptoms.map(s => s.symptom.id),
+      images: updatedVaccination.images.map(image => ({
+        ...image,
+        image: `${baseUrl}/${image.image}`, // Prepend base URL to image path
+      })),
     };
-
-
-    return transformedVaccination;
   }
+
 
   async remove(id: number, parentId: number) {
     const vaccination = await this.databaseService.vaccination.findUnique({ where: { id, isDeleted: false } });

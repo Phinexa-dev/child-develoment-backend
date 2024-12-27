@@ -1,4 +1,5 @@
 
+import { Transform } from 'class-transformer';
 import { IsArray, IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class UpdateVaccinationDto {
@@ -22,6 +23,9 @@ export class UpdateVaccinationDto {
     @IsOptional()
     @IsArray()
     @IsInt({ each: true })
+    @Transform(({ value }) =>
+        Array.isArray(value) ? value.map(v => parseInt(v.toString(), 10)) : []
+    )
     symptomIds?: number[];
 
     @IsOptional()

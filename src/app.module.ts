@@ -26,12 +26,18 @@ import { VaccineModule } from './vaccine/vaccine.module';
 import { VaccinationModule } from './vaccination/vaccination.module';
 import { PostSymptomModule } from './post-symptom/post-symptom.module';
 import { SymptomModule } from './symptom/symptom.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,  // Makes ConfigModule available throughout the app without importing it in other modules
       envFilePath: '.env', // Path to your .env file, you can also specify multiple paths in an array
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'), // Serve files from 'uploads' folder
+      serveRoot: '/uploads', // Accessible at '/uploads' URL
     }),
     DatabaseModule,
     SchoolsModule,
