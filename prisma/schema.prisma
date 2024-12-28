@@ -415,6 +415,7 @@ model Appointments{
   note          String?
   venue         String
   isDeleted     Boolean @default(false) 
+  appointmentNumber Int?
   child Child @relation(fields: [childId], references: [childId])
 }
 

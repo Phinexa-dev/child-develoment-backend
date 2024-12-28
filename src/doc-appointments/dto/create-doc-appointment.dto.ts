@@ -20,4 +20,8 @@ export class CreateAppointmentDto {
     @IsNotEmpty()
     @IsInt()
     childId: number;
+
+    @IsOptional()
+    @IsInt()
+    appointmentNumber: number;
 }

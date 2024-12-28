@@ -1,4 +1,4 @@
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class UpdateAppointmentDto {
     @IsOptional()
@@ -16,5 +16,9 @@ export class UpdateAppointmentDto {
     @IsOptional()
     @IsString()
     venue?: string;
+
+    @IsOptional()
+    @IsInt()
+    appointmentNumber?: number;
 
 }

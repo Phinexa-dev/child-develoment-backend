@@ -31,6 +31,7 @@ export class DocAppointmentsService {
         date: createAppointmentDto.date,
         note: createAppointmentDto.note,
         venue: createAppointmentDto.venue,
+        appointmentNumber: createAppointmentDto.appointmentNumber,
         child: {
           connect: { childId: createAppointmentDto.childId },
         },
@@ -52,6 +53,7 @@ export class DocAppointmentsService {
         date: true,
         note: true,
         venue: true,
+        appointmentNumber: true,
       },
       orderBy: {
         date: 'desc',
@@ -82,7 +84,8 @@ export class DocAppointmentsService {
         doctor: updateAppointmentDto.doctor,
         date: updateAppointmentDto.date,
         note: updateAppointmentDto.note,
-        venue: updateAppointmentDto.venue
+        venue: updateAppointmentDto.venue,
+        appointmentNumber: updateAppointmentDto.appointmentNumber
       },
     });
   }
