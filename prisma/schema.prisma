@@ -77,6 +77,7 @@ model Child {
   Sleep          Sleep[]
   Allergies      Allergies[]
   Vaccination    Vaccination[]
+  Appointments   Appointments[]
 }
 
 model ParentChild {
@@ -403,4 +404,15 @@ model VaccinationImages{
   isDeleted     Boolean @default(false) 
   vaccinationId Int
   vaccination   Vaccination  @relation(fields: [vaccinationId], references: [id])
+}
+
+model Appointments{
+  id            Int     @id @default(autoincrement())
+  childId   Int
+  doctor        String 
+  date          DateTime
+  note          String?
+  venue         String
+  isDeleted     Boolean @default(false) 
+  child Child @relation(fields: [childId], references: [childId])
 }
