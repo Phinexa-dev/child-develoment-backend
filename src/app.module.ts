@@ -29,6 +29,7 @@ import { SymptomModule } from './symptom/symptom.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { DocAppointmentsModule } from './doc-appointments/doc-appointments.module';
+import { HealthRecordModule } from './health-record/health-record.module';
 
 @Module({
   imports: [
@@ -64,7 +65,8 @@ import { DocAppointmentsModule } from './doc-appointments/doc-appointments.modul
    VaccinationModule,
    PostSymptomModule,
    SymptomModule,
-   DocAppointmentsModule],
+   DocAppointmentsModule,
+   HealthRecordModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -78,6 +78,7 @@ model Child {
   Allergies      Allergies[]
   Vaccination    Vaccination[]
   Appointments   Appointments[]
+  HealthRecords  HealthRecords[]
 }
 
 model ParentChild {
@@ -415,4 +416,14 @@ model Appointments{
   venue         String
   isDeleted     Boolean @default(false) 
   child Child @relation(fields: [childId], references: [childId])
+}
+
+model HealthRecords {
+  id        Int      @id @default(autoincrement())
+  childId   Int
+  isDeleted Boolean  @default(false)
+  title     String
+  file      String
+
+  child     Child    @relation(fields: [childId], references: [childId])
 }
