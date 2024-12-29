@@ -90,7 +90,6 @@ export class DocAppointmentsService {
     });
   }
 
-
   async delete(id: number, parentId: number) {
     const appointment = await this.databaseService.appointments.findUnique({
       where: { id, isDeleted: false },
