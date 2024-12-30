@@ -1,13 +1,16 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateChildDto } from './dto/create-child-dto';
 import { UpdateChildDto } from './dto/update-child-dto';
-
+import * as fs from 'fs';
+import * as path from 'path';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ChildService {
 
-  constructor(private readonly databaseService: DatabaseService) { }
+  constructor(private readonly databaseService: DatabaseService,
+    private readonly configService: ConfigService) { }
 
   async create(createChildDto: CreateChildDto, parentId: number) {
 
@@ -62,6 +65,8 @@ export class ChildService {
   }
 
   async findAll(parentId: number) {
+    const baseUrl = this.configService.getOrThrow('ENV');
+
     const activeChildren = await this.databaseService.parentChild.findMany({
       where: {
         parentId: parentId,
@@ -72,7 +77,15 @@ export class ChildService {
       },
     });
 
-    const children = activeChildren.map(relation => relation.child);
+    const children = activeChildren.map(relation => {
+      const child = relation.child;
+
+      return {
+        ...child,
+        image: child.image ? `${baseUrl}/child-images/${child.image}` : null,
+      };
+    });
+
     return children;
   }
 
@@ -82,7 +95,7 @@ export class ChildService {
       where: {
         parentId: parentId,
         childId: id,
-        status: 'Active'
+        status: 'Active',
       },
     });
 
@@ -90,15 +103,35 @@ export class ChildService {
       throw new NotFoundException('Child does not belong to this parent or is not active.');
     }
 
-    return await this.databaseService.child.findUnique({
+    const child = await this.databaseService.child.findUnique({
       where: {
         childId: id,
+      },
+    });
+
+    if (!child) {
+      throw new NotFoundException('Child record not found.');
+    }
+
+    const baseUrl = this.configService.getOrThrow('ENV');
+    return {
+      ...child,
+      image: child.image ? `${baseUrl}/uploads/child-images/${child.image}` : null,
+    };
+  }
+
+  private async deleteFile(filePath: string) {
+    try {
+      const fullPath = path.join('./uploads/child-images', filePath);
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
       }
-    })
+    } catch (err) {
+      console.error(`Error deleting file: ${err.message}`);
+    }
   }
 
   async update(id: number, updateChildDto: UpdateChildDto, parentId: number) {
-
     const parentChildRelation = await this.databaseService.parentChild.findFirst({
       where: {
         parentId: parentId,
@@ -111,16 +144,25 @@ export class ChildService {
       throw new UnauthorizedException('You are not authorized to update this child information');
     }
 
-    const updatedChild = await this.databaseService.child.update({
+    const existingChild = await this.databaseService.child.findUnique({
       where: { childId: id },
-      data: {
-        ...updateChildDto,
-      },
+      select: { image: true },
     });
 
-    return updatedChild;
-  }
+    if (!existingChild) {
+      throw new BadRequestException('Child record not found.');
+    }
 
+    // Delete the existing image if a new one is uploaded
+    if (updateChildDto.image && existingChild.image) {
+      await this.deleteFile(existingChild.image);
+    }
+
+    return this.databaseService.child.update({
+      where: { childId: id },
+      data: updateChildDto,
+    });
+  }
 
   async remove(id: number, parentId: number): Promise<void> {
 
