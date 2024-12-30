@@ -425,6 +425,7 @@ model HealthRecords {
   isDeleted Boolean  @default(false)
   title     String
   file      String
-
+  notes     String? 
+  date      DateTime @default(now())
   child     Child    @relation(fields: [childId], references: [childId])
 }

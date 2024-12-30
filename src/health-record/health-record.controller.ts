@@ -62,6 +62,37 @@ export class HealthRecordController {
     return this.healthRecordService.remove(id, parent.parentId);
   }
 
+  @Post(':id')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/health-records',
+        filename: (req, file, cb) => {
+          const uniqueName = `${Date.now()}-${file.originalname}`;
+          cb(null, uniqueName);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        const allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        if (allowedMimeTypes.includes(file.mimetype)) {
+          cb(null, true);
+        } else {
+          cb(new BadRequestException('Invalid file type'), false);
+        }
+      },
+    }),
+  )
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File | null,
+    @Body() updateHealthRecordDto: UpdateHealthRecordDto,
+    @CurrentUser() parent: Parent,
+  ) {
+    return this.healthRecordService.update(id, updateHealthRecordDto, file, parent.parentId);
+  }
+
+
   // @Post()
   // create(@Body() createHealthRecordDto: CreateHealthRecordDto) {
   //   return this.healthRecordService.create(createHealthRecordDto);

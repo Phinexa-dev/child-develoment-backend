@@ -3,6 +3,7 @@ import { CreateHealthRecordDto } from './dto/create-health-record.dto';
 import { UpdateHealthRecordDto } from './dto/update-health-record.dto';
 import { DatabaseService } from 'src/database/database.service';
 import { ConfigService } from '@nestjs/config';
+import { unlinkSync } from 'fs';
 
 @Injectable()
 export class HealthRecordService {
@@ -45,6 +46,8 @@ export class HealthRecordService {
         },
         file: createHealthRecordDto.file,
         title: createHealthRecordDto.title,
+        notes: createHealthRecordDto.notes,
+        date: createHealthRecordDto.date
       },
     });
   }
@@ -62,6 +65,8 @@ export class HealthRecordService {
         title: true,
         file: true,
         childId: true,
+        notes: true,
+        date: true
       },
       orderBy: {
         id: 'desc',
@@ -78,8 +83,40 @@ export class HealthRecordService {
     return `This action returns a #${id} healthRecord`;
   }
 
-  update(id: number, updateHealthRecordDto: UpdateHealthRecordDto) {
-    return `This action updates a #${id} healthRecord`;
+  async update(
+    id: number,
+    updateHealthRecordDto: UpdateHealthRecordDto,
+    file: Express.Multer.File | null,
+    parentId: number,
+  ) {
+    const existingRecord = await this.databaseService.healthRecords.findUnique({
+      where: { id },
+      select: { childId: true, file: true },
+    });
+
+    if (!existingRecord) {
+      throw new NotFoundException(`Health record with ID ${id} not found`);
+    }
+
+    await this.verifyParentChildRelation(parentId, existingRecord.childId);
+
+    if (file) {
+      const filePath = `./uploads/health-records/${existingRecord.file}`;
+      try {
+        unlinkSync(filePath); 
+      } catch (err) {
+        console.warn(`File not found or already deleted: ${filePath}`);
+      }
+
+      updateHealthRecordDto.file = file.filename;
+    }
+
+    return this.databaseService.healthRecords.update({
+      where: { id },
+      data: {
+        ...updateHealthRecordDto,
+      },
+    });
   }
 
   async remove(id: number, parentId: number) {

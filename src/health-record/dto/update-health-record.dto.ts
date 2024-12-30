@@ -1,4 +1,19 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateHealthRecordDto } from './create-health-record.dto';
+import { IsOptional, IsString, IsDateString } from 'class-validator';
 
-export class UpdateHealthRecordDto extends PartialType(CreateHealthRecordDto) {}
+
+export class UpdateHealthRecordDto {
+    @IsOptional()
+    @IsString()
+    title?: string;
+
+    @IsOptional()
+    file?: any;
+
+    @IsOptional()
+    @IsDateString()
+    date?: string;
+
+    @IsOptional()
+    @IsString()
+    notes?: string;
+}

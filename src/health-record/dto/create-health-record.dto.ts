@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsDateString, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateHealthRecordDto {
     @IsInt()
@@ -11,4 +11,12 @@ export class CreateHealthRecordDto {
     title: string;
 
     file: any;
+
+    @IsOptional()
+    @IsDateString()
+    date?: string;
+
+    @IsOptional()
+    @IsString()
+    notes?: string;
 }
