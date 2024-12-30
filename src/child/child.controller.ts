@@ -14,8 +14,36 @@ export class ChildController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(@Body() createChildDto: CreateChildDto, @CurrentUser() parent: Parent) {
-    return this.childService.create(createChildDto, parent.parentId);
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads/child-images',
+        filename: (req, file, cb) => {
+          const uniqueName = `${Date.now()}-${file.originalname}`;
+          cb(null, uniqueName);
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        const allowedMimeTypes = ['image/jpeg', 'image/png'];
+        if (allowedMimeTypes.includes(file.mimetype)) {
+          cb(null, true);
+        } else {
+          cb(new BadRequestException('Invalid file type'), false);
+        }
+      },
+    }),
+  )
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createChildDto: CreateChildDto,
+    @CurrentUser() parent: Parent,
+  ) {
+    const imagePath = file ? file.filename : null;
+
+    return this.childService.create(
+      { ...createChildDto, image: imagePath },
+      parent.parentId,
+    );
   }
 
   @Get()
