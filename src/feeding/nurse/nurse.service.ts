@@ -183,7 +183,7 @@ export class NurseService {
     });
 
     if (records.length === 0) {
-      throw new NotFoundException('No nursing records found for this child.');
+      return records;
     }
 
     const durations = records.map(record => (record.leftDuration || 0) + (record.rightDuration || 0));

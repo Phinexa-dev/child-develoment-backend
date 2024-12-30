@@ -137,7 +137,7 @@ export class SleepService {
     });
 
     if (records.length === 0) {
-      throw new NotFoundException('No sleep records found for this child.');
+      return records;
     }
 
     const dayStartHour = 6;
@@ -162,7 +162,7 @@ export class SleepService {
 
       if (i > 0) {
         const prevDate = new Date(records[i - 1].date);
-        const interval = (prevDate.getTime() - sleepDate.getTime()) / (1000 * 60);
+        const interval = (sleepDate.getTime() - prevDate.getTime()) / (1000 * 60); 
         intervals.push(interval);
       }
     }
@@ -176,7 +176,8 @@ export class SleepService {
     const averageDayTimeDuration = dayTimeDuration / records.length;
     const averageNightTimeDuration = nightTimeDuration / records.length;
     const averageTotalDuration = totalDuration / records.length;
-    const averageInterval = intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
+    const averageInterval =
+      intervals.reduce((sum, interval) => sum + interval, 0) / intervals.length;
 
     return {
       startingDay: new Date(records[0].date).toISOString().split('T')[0],
@@ -187,4 +188,5 @@ export class SleepService {
       averageInterval: formatDuration(averageInterval),
     };
   }
+
 }
