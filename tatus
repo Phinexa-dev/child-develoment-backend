@@ -1,0 +1,699 @@
+[33mcommit 5109b11156f81c263610eaee6ae2adfbbca533d6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeeding-changes[m[33m, [m[1;31morigin/sg/dev/save-profile-images[m[33m, [m[1;32msg/dev/save-profile-images[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Mon Dec 30 22:21:29 2024 +0530
+
+    removed files added for test purposes
+
+[33mcommit a7291fd180a248af841a5572dc6f0282bba3714a[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Mon Dec 30 22:20:27 2024 +0530
+
+    enabled child creation with image
+
+[33mcommit ce07316db4ae15f8495cb3506b5bf8cba5b616df[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Mon Dec 30 14:54:16 2024 +0530
+
+    added images for parent and child profiles
+
+[33mcommit 7bf779fafdcc77d753c7d883bbfca319202b11ec[m[33m ([m[1;31morigin/sg/dev/add-notes-to-health-records[m[33m, [m[1;32msg/dev/add-notes-to-health-records[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Mon Dec 30 14:05:42 2024 +0530
+
+    added notes and date to the health records and update endpoint
+
+[33mcommit dcf90a59dca8ae0b8248387596d398947d48f1c9[m[33m ([m[1;31morigin/sg/dev/sleep-summary-changes[m[33m, [m[1;32msg/dev/sleep-summary-changes[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Mon Dec 30 11:54:46 2024 +0530
+
+    summary endpoint changes
+
+[33mcommit d9507725dbdd9cc3e01b4d85ee149c4b0a09f4f1[m[33m ([m[1;32msg/dev/doc-appointment-changes[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Dec 29 14:28:48 2024 +0530
+
+    removed extra space
+
+[33mcommit 279e3fe92d59ed5c00865f2208ffe49a875bb452[m[33m ([m[1;31morigin/sg/dev/doc-appointment-changes[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sat Dec 28 23:43:33 2024 +0530
+
+    added appointment number field to appointments
+
+[33mcommit c1908ce14b3effeb5a215e0b4926c363608a6beb[m[33m ([m[1;31morigin/sg/dev/health-records-crud[m[33m, [m[1;32msg/dev/health-records-crud[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sat Dec 28 18:06:20 2024 +0530
+
+    added health records endpoints
+
+[33mcommit dfb70bf02c0f54fa31b070bdc1ea8de1cc6d74d4[m[33m ([m[1;31morigin/sg/dev/doc-appointments[m[33m, [m[1;32msg/dev/doc-appointments[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sat Dec 28 17:12:19 2024 +0530
+
+    added doctor appointment endpoints
+
+[33mcommit 4210f95515bd0528bae3125fbd2a4f26cba0582a[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Merge: d3b7b39 c4ce6be
+Author: Sahan Gawesh <sahangawesh19@gmail.com>
+Date:   Fri Dec 27 19:02:54 2024 +0530
+
+    Merge pull request #37 from Phinexa-dev/sg/dev/save-images-in-server
+    
+    Sg/dev/save images in server
+
+[33mcommit d3b7b39a662d901827a392382be92f6cb4ba86bb[m
+Merge: eb7a67f 0dfd9a4
+Author: Sahan Gawesh <sahangawesh19@gmail.com>
+Date:   Fri Dec 27 18:58:38 2024 +0530
+
+    Merge pull request #36 from Phinexa-dev/sg/dev/sleep-changes
+    
+    added dto validations
+
+[33mcommit c4ce6be41e89bd740603fcd7e8171c10d702c072[m[33m ([m[1;31morigin/sg/dev/save-images-in-server[m[33m, [m[1;32msg/dev/save-images-in-server[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Fri Dec 27 18:56:46 2024 +0530
+
+    removed local saved files
+
+[33mcommit 0dfd9a4ed307be6e0430800300618ff7fda9e29c[m[33m ([m[1;31morigin/sg/dev/sleep-changes[m[33m, [m[1;32msg/dev/sleep-changes[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Fri Dec 27 18:39:36 2024 +0530
+
+    added dto validations
+
+[33mcommit 7d05b873f5890fb4a84c933b0ef8a515e965c63e[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Fri Dec 27 17:57:13 2024 +0530
+
+    uploading images to server
+
+[33mcommit eb7a67f76e6e54d57b7d750f9da4c12df41b103c[m
+Merge: 749b29e 15c1c16
+Author: Sahan Gawesh <sahangawesh19@gmail.com>
+Date:   Thu Dec 26 10:38:17 2024 +0530
+
+    Merge pull request #35 from Phinexa-dev/sg/dev/stat-endpoints
+    
+    Sg/dev/stat endpoints
+
+[33mcommit 749b29ed10efb6221961092baf170ba07e84002c[m
+Merge: 2c4c3ef 3d5cdc4
+Author: Sahan Gawesh <sahangawesh19@gmail.com>
+Date:   Thu Dec 26 10:37:39 2024 +0530
+
+    Merge pull request #34 from Phinexa-dev/sg/dev/parent-account-changes
+    
+    Sg/dev/parent account changes
+
+[33mcommit 2c4c3ef7c7c44884a26bee67a97a44b0ee7888b0[m
+Merge: 9512ac9 df2d328
+Author: Sahan Gawesh <sahangawesh19@gmail.com>
+Date:   Thu Dec 26 10:37:07 2024 +0530
+
+    Merge pull request #33 from Phinexa-dev/sg/dev/vaccination-changes
+    
+    Sg/dev/vaccination changes
+
+[33mcommit 15c1c163ddbee5c7340ea4add93bc9f1f05dc28f[m[33m ([m[1;31morigin/sg/dev/stat-endpoints[m[33m, [m[1;32msg/dev/stat-endpoints[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Thu Dec 26 00:30:00 2024 +0530
+
+    added summary endpoints for growth
+
+[33mcommit 3d5cdc443afee0f43af0e2176bebbd7fd2748a72[m[33m ([m[1;31morigin/sg/dev/parent-account-changes[m[33m, [m[1;32msg/dev/parent-account-changes[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Dec 25 23:02:35 2024 +0530
+
+    modified routes for updating account information
+
+[33mcommit df2d328f017d86965d756da12f1484620cf9e048[m[33m ([m[1;31morigin/sg/dev/vaccination-changes[m[33m, [m[1;32msg/dev/vaccination-changes[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Dec 25 19:26:40 2024 +0530
+
+    vaccination changes accoriding to specs
+
+[33mcommit 3f3c1d3689cacfbd64e7e5412e7f9cfebec9fd52[m
+Merge: 61014fa 9512ac9
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Fri Dec 13 04:17:44 2024 +0530
+
+    Merge branch 'main' of https://github.com/Phinexa-dev/child-develoment-backend into sg/dev/vaccination-changes
+
+[33mcommit 61014fae618219a09ca316520c8be24b6321b30d[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Fri Dec 13 04:08:36 2024 +0530
+
+    auth response changed
+
+[33mcommit b40960ad6136203fa9ca8e59108e3df99f167f25[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Tue Dec 10 06:32:01 2024 +0530
+
+    vaccination chnages
+
+[33mcommit 9512ac92b44ebc56cde41533f9684bc5e03dfa70[m
+Merge: a91f9e5 665cf29
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Wed Dec 4 17:13:37 2024 +0530
+
+    Merge pull request #32 from Phinexa-dev/sg/dev/stat-apis
+    
+    added stat apis
+
+[33mcommit 665cf29c0edb48dc4446a4d41c55f326f69734ec[m[33m ([m[1;31morigin/sg/dev/stat-apis[m[33m, [m[1;32msg/dev/stat-apis[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Dec 4 05:03:05 2024 +0530
+
+    added Bottle Stat endpoint
+
+[33mcommit 0ee3fca3afbd3b3ff68e88864ecc2ced22e8d12e[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Dec 4 04:50:42 2024 +0530
+
+    added stat endpoints
+
+[33mcommit a91f9e50b3a8d68e88bd20b706e8b41b159b251c[m
+Merge: a1a00d9 df97003
+Author: Sahan Gawesh <sahangawesh19@gmail.com>
+Date:   Fri Nov 29 21:56:05 2024 +0530
+
+    Merge pull request #22 from Phinexa-dev/sg/dev/child-changes
+    
+     changed child endpoint according to the specs
+
+[33mcommit df97003cebe16832ef19684f6cc782ee6bcc44aa[m[33m ([m[1;31morigin/sg/dev/child-changes[m[33m, [m[1;32msg/dev/child-changes[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Fri Nov 29 04:31:29 2024 +0530
+
+     changed child endpoint according to the specs
+
+[33mcommit a1a00d90da462391f9172d9e5f7907160393be7e[m
+Merge: 0f58add 0819cc6
+Author: Sahan Gawesh <sahangawesh19@gmail.com>
+Date:   Thu Nov 28 22:49:48 2024 +0530
+
+    Merge pull request #21 from Phinexa-dev/sg/dev/growth-changes
+    
+    growth changes according to spec
+
+[33mcommit 0819cc6e1cae621b78a58ed3d3f38f4c8c52eb89[m[33m ([m[1;31morigin/sg/dev/growth-changes[m[33m, [m[1;32msg/dev/growth-changes[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Thu Nov 28 03:51:07 2024 +0530
+
+    growth changes acccording to spec
+
+[33mcommit 0f58add4340e932266f5511363b6058db94bdb46[m
+Merge: b467fa1 4ca7791
+Author: Sahan Gawesh <sahangawesh19@gmail.com>
+Date:   Sun Nov 24 11:59:34 2024 +0530
+
+    Merge pull request #20 from Phinexa-dev/sg/dev/category-changes
+    
+    changes solid records according to the specs
+
+[33mcommit 4ca7791b7356e6aabb7e48c4fd9d0aa5f6b63474[m[33m ([m[1;31morigin/sg/dev/category-changes[m[33m, [m[1;32msg/dev/category-changes[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sat Nov 23 15:24:16 2024 +0530
+
+    changes solid records according to the specs also added image Path to the category item.
+
+[33mcommit b467fa1ed4b4c941e4b998c3fb44dfc56eabfd64[m
+Merge: effa954 c3c43ea
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Thu Nov 14 02:15:49 2024 +0530
+
+    Merge pull request #19 from Phinexa-dev/sg/dev/solid-changes
+    
+    changed solids according to specs
+
+[33mcommit c3c43ea239efd44189a56e52441ea66c32a96f9a[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Thu Nov 14 01:39:05 2024 +0530
+
+    chnaged solids according to specs
+
+[33mcommit effa954415db7a82453978bc58cb53d540edec71[m
+Merge: 75caaae afde8a4
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Wed Nov 13 19:37:45 2024 +0530
+
+    Merge pull request #18 from Phinexa-dev/sg/dev/vaccination-crud
+    
+    Sg/dev/vaccination crud
+
+[33mcommit 75caaae3afec9da226eac454cdb98e87afdf7c0e[m
+Merge: e707cff 89da549
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Wed Nov 13 19:37:32 2024 +0530
+
+    Merge pull request #17 from Phinexa-dev/sg/dev/feeding-crud
+    
+    changes according to spec
+
+[33mcommit 89da5499606f057f21c6d2edd59cae2de5497512[m[33m ([m[1;31morigin/sg/dev/feeding-crud[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 13 17:11:16 2024 +0530
+
+    changes according to spec
+
+[33mcommit afde8a4f9f63527f555912a05b37ff81c189d6cc[m[33m ([m[1;31morigin/sg/dev/vaccination-crud[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 13 16:51:11 2024 +0530
+
+    vaccination-crud
+
+[33mcommit 1baeb33f745f555e70729394a0f9686005d042c3[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 13 12:56:33 2024 +0530
+
+    vaccination crud
+
+[33mcommit c3c6935641d490dcbde51539f3de4a7bf034c58d[m
+Merge: d6c7737 e707cff
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 13 00:53:12 2024 +0530
+
+    Merge branch 'main' of https://github.com/Phinexa-dev/child-develoment-backend into sg/dev/vaccination-crud
+
+[33mcommit e707cff859ca7a7fcc5521221f20558a8f68d02c[m
+Merge: 6acfc02 14c845e
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Wed Nov 13 00:47:53 2024 +0530
+
+    Merge pull request #12 from Phinexa-dev/sg/dev/authentication
+    
+    Sg/dev/authentication
+
+[33mcommit 14c845ed94633ada4616f78b32c34704ea22640d[m[33m ([m[1;31morigin/sg/dev/authentication[m[33m)[m
+Merge: c1b407b fd98baf
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 13 00:42:47 2024 +0530
+
+    Merge branch 'main' of https://github.com/Phinexa-dev/child-develoment-backend into sg/dev/authentication
+
+[33mcommit 6acfc026e4f61d77081accff5a5fabfe60844666[m
+Merge: fd98baf 76e3f48
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Wed Nov 13 00:41:48 2024 +0530
+
+    Merge pull request #16 from Phinexa-dev/sg/dev/feeding-crud
+    
+    changes according to the spec
+
+[33mcommit 76e3f484d49c9bc5f07a2c09cbe8f828574f44e2[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 13 00:10:41 2024 +0530
+
+    fixed aditional /
+
+[33mcommit 3f08cc41248ae86eba38e1db08cca805e13427fc[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Tue Nov 12 23:57:23 2024 +0530
+
+    changes according to the spec
+
+[33mcommit d6c77373cff322ecc5dad4589616dc9f4134bca4[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Tue Nov 12 21:59:38 2024 +0530
+
+    vaccine-crud
+
+[33mcommit e410591642157dca3e6b960a2334c93d0f82b810[m
+Merge: 5f18cee fd98baf
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Mon Nov 11 20:01:06 2024 +0530
+
+    merge branch 'main' of https://github.com/Phinexa-dev/child-develoment-backend into sg/dev/vaccination-crud
+    
+    to get the schema changes
+
+[33mcommit 5f18cee0b276a28eef3b990736c0274c45c550b1[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Mon Nov 11 20:00:47 2024 +0530
+
+    schema for vaccination
+
+[33mcommit fd98baf7a602b9711e1b9b577ae1fcd33bbb8756[m
+Merge: 617f9a7 8be9578
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Mon Nov 11 16:25:16 2024 +0530
+
+    Merge pull request #13 from Phinexa-dev/sg/dev/medication-crud
+    
+    Medication CRUD + delete flags
+
+[33mcommit 617f9a757c72e15593b1162d0d35e69f7f53c6e0[m
+Merge: cdce4de 96ab11b
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Mon Nov 11 16:23:46 2024 +0530
+
+    Merge pull request #9 from Phinexa-dev/sg/dev/feeding-crud
+    
+    Feeding CRUD
+
+[33mcommit 96ab11b2b761c988275d675c63e4865d26cf5148[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Mon Nov 11 11:57:48 2024 +0530
+
+    changed solid enpoints accpring to the spec
+
+[33mcommit 442018bdf7df164f670088ecf46486e9be8e61a5[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Nov 10 17:51:33 2024 +0530
+
+    adjusted enpoints according to the spec
+
+[33mcommit 704defcf7733611f726f9ad4227601f394aa61b9[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Fri Nov 8 03:32:05 2024 +0530
+
+    added deleted flags for rest of feeding section
+
+[33mcommit ef3aed88aff1c71da04b7c8fa7801d1b17eeef90[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Thu Nov 7 03:00:54 2024 +0530
+
+    added delete flag to Nurse and adjusted endpoints according to the specs
+
+[33mcommit c1b407b4a186ec9b18046e01ac1ebd5cc91131e3[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Thu Nov 7 01:43:22 2024 +0530
+
+    Auth Endpoints according to specs
+
+[33mcommit d26adbb926cd2e4fbff56a499c2f85ee3aa5caa7[m[33m ([m[1;31morigin/sg/dev/sleep-crud[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 6 23:11:22 2024 +0530
+
+    added isDeleted flag
+
+[33mcommit b85d5ab260640dbd0ff75e38b0d5176a5a26651a[m[33m ([m[1;31morigin/sg/dev/growth-crud[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 6 02:13:13 2024 +0530
+
+    added delete flag
+
+[33mcommit b1866600523542573166a89adbe1fd5d89cd0d53[m
+Merge: f02c7a6 684bc66
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 6 01:53:06 2024 +0530
+
+    Merge branch 'sg/dev/allergies' of https://github.com/Phinexa-dev/child-develoment-backend into sg/dev/growth-crud
+    to have  the schema changes  in the other branches
+
+[33mcommit f02c7a6b70f82bd0e62290218d12f2d23395927b[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 6 01:51:29 2024 +0530
+
+    Added isDeleted on schema
+
+[33mcommit 684bc66f9d7f324008eb1cd570aed89f0f0fdbff[m[33m ([m[1;31morigin/sg/dev/allergies[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 6 01:42:33 2024 +0530
+
+    removed DTO and entity folders
+
+[33mcommit 319e4aa758e42b5d2b785b9096e2aa2c0c7bd00d[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Wed Nov 6 01:31:08 2024 +0530
+
+    Allergies-crud
+
+[33mcommit 8be95787b9b5558d0bad2aba2d004a3518763ab2[m[33m ([m[1;31morigin/sg/dev/medication-crud[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sat Nov 2 17:28:33 2024 +0530
+
+    Medicine CRUD
+
+[33mcommit 6958c329beadd35917db9091e6270c87fba0c565[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Fri Nov 1 00:45:10 2024 +0530
+
+    default and custom medicine crud
+
+[33mcommit 2a94677aa545e20abd45d6eff1a23e7e7b32cbb9[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Fri Oct 25 02:25:08 2024 +0530
+
+    Feeding CRUD
+
+[33mcommit e34950aaaff9d17c61766a7ef421efe1941c97a5[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Oct 20 16:31:18 2024 +0530
+
+    category and category Item crud
+
+[33mcommit f9bab4a92c5038c2420f2bfd996ef7aa1b935a24[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 22 18:18:05 2024 +0530
+
+    Bottle-Crud
+
+[33mcommit 4bfb5c33d056467cbbde6111426400f0df893709[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sat Sep 21 17:44:06 2024 +0530
+
+    Error handling -  milk-type
+
+[33mcommit d8662b44d6f720bf5a604d3114b006db1c044c95[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sat Sep 21 17:31:32 2024 +0530
+
+    Milk Type Crud
+
+[33mcommit f2d11a03b008311f8c74af3e1a818970f4c972aa[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sat Sep 21 16:29:24 2024 +0530
+
+    Get Nursing records by Date
+
+[33mcommit 885e174e93c3fcca094139afa8f5b2ffcc17cabf[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Mon Sep 16 19:10:40 2024 +0530
+
+    nursing-crud
+
+[33mcommit cdce4de2bd499d9680bbd5b8dd0cb5e66645060c[m
+Merge: 93a272a 8dc0e86
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Sun Sep 15 21:30:54 2024 +0530
+
+    Merge pull request #7 from Phinexa-dev/sg/dev/sleep-crud
+    
+    Added Sleep Crud
+
+[33mcommit 8dc0e8622cb6f61ac4cb54fa30d8ac7c5404b8e2[m
+Merge: c0dbe61 93a272a
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 15 21:28:08 2024 +0530
+
+    conflict resolve and extra lines removed
+
+[33mcommit 93a272abd1505285e685db2644ffbc9a7b4f9c61[m
+Merge: 4d89aed 8963642
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Sun Sep 15 21:15:55 2024 +0530
+
+    Merge pull request #5 from Phinexa-dev/sg/dev/growth-crud
+    
+    Growth - CRUD
+
+[33mcommit 8963642f0eb3e4a6eac7dc4ea63645d83ef75bee[m
+Merge: 56470b1 4d89aed
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 15 20:02:26 2024 +0530
+
+    conflicts resovle  extra lines removed
+
+[33mcommit 4d89aed6157b0aa6ceeb449c6bdfc84eaaeb20b9[m
+Merge: ea1e630 708e508
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Sun Sep 15 19:47:00 2024 +0530
+
+    Merge pull request #4 from Phinexa-dev/sg/dev/child-crud
+    
+    Child CRUD
+
+[33mcommit 708e508cfceab71bbc8d7fce3a31b5a3d6a56546[m[33m ([m[1;31morigin/sg/dev/child-crud[m[33m)[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 15 19:42:36 2024 +0530
+
+    extra lines removed
+
+[33mcommit 56470b1ceb8d4df74a95e7d09ee4878aec9eb079[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 18:42:01 2024 +0530
+
+    removed extra spaces
+
+[33mcommit c0dbe61cd2e7027229c456473778cb389b96e114[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 18:40:44 2024 +0530
+
+    removed extra spaces
+
+[33mcommit eb8d7ed202590b6ca3afb02c6d024551bbca12d8[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 18:38:09 2024 +0530
+
+    removed extra spaces
+
+[33mcommit 42d47af395138ef1bd663dfe0826f67d1b7270f0[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 18:36:13 2024 +0530
+
+    removed extra spaces
+
+[33mcommit 0f016ffc0ca166ebc50f69bda5e3b33ffaa77081[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 11:25:47 2024 +0530
+
+    Added Sleep-crud
+
+[33mcommit 4cbce868dc6227a3af1d5be24b25a37993be29a3[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 11:14:10 2024 +0530
+
+    resolve Conflicts
+
+[33mcommit f604594595acc268cc7b08814b6beff2d4c4dac6[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 10:59:34 2024 +0530
+
+    extra space removed
+
+[33mcommit 3a66ff322fe4f15eb64603faf0ec1fcc2bf899c5[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 10:58:18 2024 +0530
+
+    removed extra space
+
+[33mcommit 82c9cfc8d92d19d7d3726b9051cbe2bf144f97a6[m
+Merge: f1c7a7d ea1e630
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 08:50:37 2024 +0530
+
+    Merge branch 'main' of https://github.com/Phinexa-dev/child-develoment-backend into sg/dev/sleep-crud
+
+[33mcommit cc4e4d8974be795b84b8c4b029ff7fefcd71b5cb[m
+Merge: 60bf922 ea1e630
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 08:39:36 2024 +0530
+
+    Merge conflicts resolve
+
+[33mcommit 6cca144b19f1ac4aff65f5bc72f8e8c8bae07e8e[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 08:26:23 2024 +0530
+
+    merge conflicts Resolve
+
+[33mcommit 2bbbc71708e5f6b2a4e358e49a2cd83a51341224[m
+Merge: 667406a ea1e630
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 08:25:59 2024 +0530
+
+    Merge branch 'main' of https://github.com/Phinexa-dev/child-develoment-backend into sg/dev/growth-crud
+
+[33mcommit f1c7a7d2704afb5363baa60238de148812b9bd9a[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sun Sep 1 08:11:02 2024 +0530
+
+    Added Sleep-Crud
+
+[33mcommit ea1e630372aa6725c49f48fa8fdc710cee11cc36[m
+Merge: 4f1288f 03b3981
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Sun Sep 1 02:35:42 2024 +0530
+
+    Merge pull request #6 from Phinexa-dev/md/dev/article-crud
+    
+    added article crud
+
+[33mcommit 03b398122202f20891ded46ef4b05e2660e0a420[m[33m ([m[1;31morigin/md/dev/article-crud[m[33m)[m
+Author: Malindu De Silva <malindupasan@gmail.com>
+Date:   Sun Sep 1 02:32:29 2024 +0530
+
+    added article crud
+
+[33mcommit 667406a54160e7c3edd4531548f48553ec39b504[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Sat Aug 31 20:47:17 2024 +0530
+
+    create record error handling
+
+[33mcommit 4c66c20190db6b24c5cbeba22a67975d866d963a[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Tue Aug 27 23:49:12 2024 +0530
+
+    growth-crud
+
+[33mcommit 60bf922e90ee93ddeb215a62fbfe5ca1702e12e2[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Mon Aug 26 01:28:28 2024 +0530
+
+    delete child
+
+[33mcommit aee34ea4c8abf078ec131d0b0f47b4cbe109b86f[m
+Author: sahan <sahangawesh19@gmail.com>
+Date:   Mon Aug 26 01:16:42 2024 +0530
+
+    Child Crud
+
+[33mcommit 4f1288fd01e8f4c88436d30d3e337c0356fbae6a[m
+Merge: 23a7d84 5bd9c7e
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Thu Aug 22 01:07:28 2024 +0530
+
+    Merge pull request #3 from Phinexa-dev/md/dev/add-authentication
+    
+    added authentication using JWT
+
+[33mcommit 5bd9c7ec87d9d40ff458db434026a85d570b748f[m[33m ([m[1;31morigin/md/dev/add-authentication[m[33m)[m
+Author: Malindu De Silva <malindupasan@gmail.com>
+Date:   Thu Aug 22 01:02:36 2024 +0530
+
+    refresh token added
+
+[33mcommit 5f8fe254ca8a5e0b9f0496350b135748f46732c7[m
+Author: Malindu De Silva <malindupasan@gmail.com>
+Date:   Wed Aug 21 03:29:43 2024 +0530
+
+    added authentication and login
+
+[33mcommit 23a7d84d1eab8afd78e9ef847159c00465cc44f3[m
+Merge: 5798c67 3f8fead
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Wed Aug 21 02:29:51 2024 +0530
+
+    Merge pull request #2 from Phinexa-dev/md/dev/parent-crud
+    
+    added basic parent crud
+
+[33mcommit 5798c677fc810f71f3d3b827df4484114384dff0[m
+Merge: d4bdd57 7800c11
+Author: Malindu De Silva <84624410+malindupasan@users.noreply.github.com>
+Date:   Wed Aug 21 02:29:14 2024 +0530
+
+    Merge pull request #1 from Phinexa-dev/md/dev/initial-proj
+    
+    added complete database with relations
+
+[33mcommit 3f8feaded38ae4a046d5ccabb99b605a71b2f4fd[m[33m ([m[1;31morigin/md/dev/parent-crud[m[33m)[m
+Author: Malindu De Silva <malindupasan@gmail.com>
+Date:   Sun Aug 18 01:48:42 2024 +0530
+
+    added parent crud
+
+[33mcommit 7800c11039787d1fbc2163ba9fb5e3ffa3844bbd[m[33m ([m[1;31morigin/md/dev/initial-proj[m[33m)[m
+Author: Malindu De Silva <malindupasan@gmail.com>
+Date:   Sun Aug 18 01:12:07 2024 +0530
+
+    database added
+
+[33mcommit d4bdd572209c86d27fe41c3effc949d47fffb41e[m
+Author: Malindu De Silva <malindupasan@gmail.com>
+Date:   Mon Aug 12 02:58:05 2024 +0530
+
+    Initial commit
