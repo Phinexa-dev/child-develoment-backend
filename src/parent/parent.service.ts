@@ -3,11 +3,15 @@ import { Prisma } from '@prisma/client';
 import { hash } from 'bcryptjs'
 import { DatabaseService } from 'src/database/database.service';
 import { CreateParentRequest } from './dto/create-parent.request';
+import { unlinkSync } from 'fs';
+import { UpdateParentDto } from './dto/update-parent-dto';
+import { ConfigService } from '@nestjs/config';
 
 
 @Injectable()
 export class ParentService {
-  constructor(private readonly databaseService: DatabaseService) { }
+  constructor(private readonly databaseService: DatabaseService,
+    private readonly configService: ConfigService) { }
 
   async create(createParentDto: CreateParentRequest) {
 
@@ -85,7 +89,7 @@ export class ParentService {
   }
 
   async findMyAccount(parentId: number) {
-    return this.databaseService.parent.findUnique({
+    const parent = await this.databaseService.parent.findUnique({
       where: {
         parentId,
       },
@@ -97,18 +101,57 @@ export class ParentService {
         image: true,
         bloodGroup: true,
         phoneNumber: true,
-        address: true
-      }
-    })
+        address: true,
+      },
+    });
+
+    if (!parent) {
+      throw new NotFoundException(`Parent with ID ${parentId} not found`);
+    }
+
+    const baseUrl = this.configService.get<string>('ENV'); // Base URL from environment variable
+
+    return {
+      ...parent,
+      image: parent.image ? `${baseUrl}/parent-images/${parent.image}` : null, // Prepend base URL to image path
+    };
   }
 
-  async UpdateMyAccount(parentId: number, updateParentDto: Prisma.ParentUpdateInput, parentTokenId: number) {
-    if (parentId != parentTokenId) return new UnauthorizedException ();
+  async UpdateMyAccount(
+    parentId: number,
+    updateParentDto: UpdateParentDto,
+    parentTokenId: number,
+    file: Express.Multer.File | null,
+  ) {
+    if (parentId !== parentTokenId) {
+      throw new UnauthorizedException('You are not authorized to update this account');
+    }
+
+    const existingParent = await this.databaseService.parent.findUnique({
+      where: { parentId },
+      select: { image: true },
+    });
+
+    if (!existingParent) {
+      throw new NotFoundException(`Parent with ID ${parentId} not found`);
+    }
+
+    if (file) {
+      if (existingParent.image) {
+        const oldImagePath = `./uploads/parent-images/${existingParent.image}`;
+        try {
+          unlinkSync(oldImagePath);
+        } catch (err) {
+          console.warn(`Failed to delete old image: ${oldImagePath}`);
+        }
+      }
+
+      updateParentDto.image = file.filename;
+    }
+
     return this.databaseService.parent.update({
-      where: {
-        parentId,
-      },
+      where: { parentId },
       data: updateParentDto,
-    })
+    });
   }
 }

@@ -28,6 +28,8 @@ import { PostSymptomModule } from './post-symptom/post-symptom.module';
 import { SymptomModule } from './symptom/symptom.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { DocAppointmentsModule } from './doc-appointments/doc-appointments.module';
+import { HealthRecordModule } from './health-record/health-record.module';
 
 @Module({
   imports: [
@@ -62,7 +64,9 @@ import { join } from 'path';
    VaccineModule,
    VaccinationModule,
    PostSymptomModule,
-   SymptomModule],
+   SymptomModule,
+   DocAppointmentsModule,
+   HealthRecordModule],
   controllers: [AppController],
   providers: [AppService],
 })

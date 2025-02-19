@@ -28,7 +28,7 @@ export class CategoryController {
     return this.categoryService.findOne(recID);
   }
 
-  @Patch(':id')
+  @Post(':id')
   update(@Param('id') id: string, @Body() updateCategoryDto: Prisma.CategoryUpdateInput) {
     const recID = parseInt(id, 10);
     if (isNaN(recID)) {
@@ -37,7 +37,7 @@ export class CategoryController {
     return this.categoryService.update(recID, updateCategoryDto);
   }
 
-  @Delete(':id')
+  @Get('delete/:id')
   remove(@Param('id') id: string) {
     const recID = parseInt(id, 10);
     if (isNaN(recID)) {

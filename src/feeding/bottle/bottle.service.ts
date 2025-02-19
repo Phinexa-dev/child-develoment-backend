@@ -218,7 +218,7 @@ export class BottleService {
     });
 
     if (records.length === 0) {
-      throw new NotFoundException('No bottle records found for this child.');
+      return  records;
     }
 
     const volumes = records.map(record => record.volume || 0);

@@ -30,13 +30,13 @@ export class CategoryItemController {
     return this.categoryItemService.findOne(+id, parent.parentId);
   }
 
-  @Patch(':id')
+  @Post(':id')
   @UseGuards(JwtAuthGuard)
   update(@Param('id') id: string, @Body() updateCategoryItemDto: UpdateCategoryItemDto, @CurrentUser() parent: Parent) {
     return this.categoryItemService.update(+id,parent.parentId, updateCategoryItemDto);
   }
 
-  @Delete(':id')
+  @Get('delete/:id')
   @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string,@CurrentUser() parent: Parent) {
     return this.categoryItemService.remove(+id,parent.parentId);
