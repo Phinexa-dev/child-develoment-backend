@@ -28,6 +28,7 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.4.15",
     "@nestjs/serve-static": "^4.0.2",
+    "@nestjs/swagger": "^11.0.4",
     "@prisma/client": "^5.18.0",
     "babycr": "file:",
     "bcryptjs": "^2.4.3",

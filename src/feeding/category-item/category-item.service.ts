@@ -22,8 +22,8 @@ export class CategoryItemService {
       const existingItem = await this.databaseService.categoryItems.findFirst({
         where: {
           categoryId: createCategoryItemDto.categoryId,
-          itemName: { equals: createCategoryItemDto.itemName, mode: 'insensitive' },
-          parentId,
+          itemName: { equals: createCategoryItemDto.name, mode: 'insensitive' },
+          parentId: parentId,
           isDeleted: false
         },
       });
@@ -34,10 +34,10 @@ export class CategoryItemService {
     }
 
     const categoryItemData: Prisma.CategoryItemsCreateInput = {
-      itemName: createCategoryItemDto.itemName,
+      itemName: createCategoryItemDto.name,
       isDefault: createCategoryItemDto.isDefault,
       category: { connect: { categoryId: createCategoryItemDto.categoryId } },
-      parent: !createCategoryItemDto.isDefault ? { connect: { parentId } } : undefined,
+      parent: !createCategoryItemDto.isDefault ? { connect: {parentId: parentId} } : undefined,
       imagePath: createCategoryItemDto.imagePath
     };
 

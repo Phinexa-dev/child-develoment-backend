@@ -1,30 +1,30 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
+import { CreateCategoryDto } from './category-dto/create-category-dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CategoryService {
 
   constructor(private readonly databaseService: DatabaseService) { }
+  
 
-  async create(createCategoryDto: Prisma.CategoryCreateInput) {
+  async create(createCategoryDto: CreateCategoryDto) {
     try {
-      if (!createCategoryDto.name) {
-        throw new BadRequestException('Category name is required');
-      }
       const existingCategory = await this.databaseService.category.findMany({
-        where: {
-          name: {
-            equals: createCategoryDto.name,
-            mode: 'insensitive',
-          },
-        },
+        where: { name: { equals: createCategoryDto.name, mode: 'insensitive' } },
       });
-      if (existingCategory.length != 0) {
+
+      if (existingCategory.length !== 0) {
         throw new BadRequestException(`Category '${createCategoryDto.name}' already exists`);
       }
+
       const newCategory = await this.databaseService.category.create({
-        data: createCategoryDto,
+        data: {
+          name: createCategoryDto.name,
+          imagePath: createCategoryDto.imagePath, // Relative path
+        },
       });
 
       return newCategory;
@@ -62,6 +62,8 @@ export class CategoryService {
     }
   }
 
+
+  // not valid as this doesn't consider the imagePath
   async update(id: number, updateCategoryDto: Prisma.CategoryUpdateInput) {
     try {
       const category = await this.findOne(id);

@@ -163,6 +163,7 @@ model SolidCat {
 model Category {
   categoryId Int    @id @default(autoincrement())
   name       String
+  imagePath  String
 
   // Relations
   items CategoryItems[]
@@ -171,7 +172,7 @@ model Category {
 model CategoryItems {
   itemId     Int     @id @default(autoincrement())
   categoryId Int
-  isDefault  Boolean
+  isDefault  Boolean?
   parentId   Int?
   itemName   String
   imagePath  String?
