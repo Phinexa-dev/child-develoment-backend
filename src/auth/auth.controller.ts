@@ -7,7 +7,9 @@ import { AuthService } from './auth.service';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresg-auth.guard';
 import { ParentService } from 'src/parent/parent.service';
 import { CreateParentRequest } from 'src/parent/dto/create-parent.request';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
     constructor(

@@ -37,7 +37,7 @@ export class SolidService {
             AND: [
               {
                 OR: [
-                  { isDefault: true },
+                  // { isDefault: true },
                   { parentId: parentId },
                 ],
               },

@@ -53,13 +53,13 @@ export class SolidcatService {
       throw new BadRequestException(`Category item with ID ${categoryItemId} not found`);
     }
 
-    if (!categoryItem.isDefault) {
-      if (categoryItem.parentId !== parentId) {
-        throw new UnauthorizedException(
-          `Category item with ID ${categoryItemId} does not belong to the authenticated parent.`
-        );
-      }
-    }
+    // if (!categoryItem.isDefault) {
+    //   if (categoryItem.parentId !== parentId) {
+    //     throw new UnauthorizedException(
+    //       `Category item with ID ${categoryItemId} does not belong to the authenticated parent.`
+    //     );
+    //   }
+    // }
     return this.databaseService.solidCat.create({
       data: createSolidcatDto,
     });
