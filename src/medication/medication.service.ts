@@ -87,6 +87,9 @@ export class MedicationService {
         isDeleted: false,
       },
       include: { timesOfDays: { 
+        where: {
+          isDeleted: false,
+        },
         orderBy: { medicationSlotId: 'asc' }  // Ordering MedicationSlot by ID in ascending order
       }}
       // include: { timesOfDays: true }, // Include MedicationSlot data
