@@ -47,7 +47,7 @@ export class MedicationSlotService {
       throw new BadRequestException("Invalid status value. Accepted values are 'taken' or 'missed'");
     }
 
-    if (createMedicationSlotDto.time && isNaN(Date.parse(createMedicationSlotDto.time.toString()))) {
+    if (createMedicationSlotDto.date && isNaN(Date.parse(createMedicationSlotDto.date.toString()))) {
       throw new BadRequestException("Invalid time format, expected ISO-8601 DateTime");
     }
 
@@ -113,7 +113,7 @@ export class MedicationSlotService {
       throw new BadRequestException("Invalid status value. Accepted values are 'taken' or 'missed'");
     }
 
-    if (updateMedicationSlotDto.time && isNaN(Date.parse(updateMedicationSlotDto.time.toString()))) {
+    if (updateMedicationSlotDto.date && isNaN(Date.parse(updateMedicationSlotDto.date.toString()))) {
       throw new BadRequestException("Invalid time format, expected ISO-8601 DateTime");
     }
 

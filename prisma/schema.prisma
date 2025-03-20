@@ -201,25 +201,28 @@ model MilkType {
 model Medication {
   id           Int      @id @default(autoincrement())
   childId      Int
-  medID        Int
-  startingDate DateTime
-  endingDate   DateTime
+  medicineId        Int
+  startDate DateTime
+  endDate   DateTime
   frequency    String
+  interval     Int
+  note         String?
   isDeleted    Boolean  @default(false)
 
   // Relations
   child    Child            @relation(fields: [childId], references: [childId])
-  medicine Medicine         @relation(fields: [medID], references: [medID])
-  slots    MedicationSlot[]
+  medicine Medicine         @relation(fields: [medicineId], references: [medID])
+  timesOfDays    MedicationSlot[]
 }
 
 model MedicationSlot {
   medicationSlotId Int       @id @default(autoincrement())
   medicationId     Int
-  option           String
-  time             DateTime?
-  amount           Float
-  status           String // taken/missed
+  option           String?
+  timeOfDay        String
+  amount           Int
+  date             DateTime
+  status           String? @default("not_taken")// taken/missed
   isDeleted        Boolean   @default(false)
 
   // Relations

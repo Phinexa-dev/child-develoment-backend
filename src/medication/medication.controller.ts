@@ -3,32 +3,63 @@ import { MedicationService } from './medication.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { Parent, Prisma } from '@prisma/client';
+import { MedicationCreateInputExtended } from './dto/create-medication-dto';
 
 @Controller('medication')
 export class MedicationController {
   constructor(private readonly medicationService: MedicationService) { }
 
-  @Post('child/:childId')
+  @Post()
   @UseGuards(JwtAuthGuard)
   create(
-    @Body() createMedicationDto: Prisma.MedicationCreateInput,
+    @Body() createMedicationDto: MedicationCreateInputExtended,
     @CurrentUser() parent: Parent,
-    @Param('childId') childId: string,
+    // @Param('childId') childId: string,
   ) {
-    const childIdNumber = parseInt(childId, 10);
+    const { childId, timesOfDays, startDate, endDate, interval, ...medicationData } = createMedicationDto;
 
-    if (isNaN(childIdNumber)) {
+    if (!childId || isNaN(Number(childId))) {
       throw new BadRequestException('Invalid childId format.');
     }
 
-    if (!createMedicationDto.child) {
-      createMedicationDto.child = {
-        connect: { childId: childIdNumber },
-      };
-    } else {
-      createMedicationDto.child.connect = { childId: childIdNumber };
+    // Parsing the start and end dates (assumed to be in UTC)
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Generate medication slots
+    const medicationSlots = [];
+
+    for (let currentDate = start; currentDate <= end; currentDate.setUTCDate(currentDate.getUTCDate() + interval)) {
+      for (const timeSlot of timesOfDays) {
+        // Combine the current date with the time from the request
+        const dateTime = new Date(Date.UTC(currentDate.getUTCFullYear(), currentDate.getUTCMonth(), currentDate.getUTCDate()));
+        // const [hour, minute, second] = timeSlot.dayTime.split(':').map(Number);
+        
+        // Set the correct hour, minute, and second
+        dateTime.setUTCHours(0, 0, 0, 0); // Ensure time is set in UTC
+        
+        // Push the slot with the combined date and time in UTC format
+        medicationSlots.push({
+          timeOfDay: timeSlot.timeOfDay, 
+          date: dateTime.toISOString(), // Returns the UTC time as 'yyyy-MM-ddTHH:mm:ss.sssZ'
+          amount: timeSlot.amount,
+        });
+      }
     }
-    return this.medicationService.create(createMedicationDto, parent.parentId);
+
+    // Prepare the prisma data object
+    const prismaData: Prisma.MedicationCreateInput = {
+      ...medicationData,
+      startDate: startDate,
+      endDate: endDate,
+      interval: interval,
+      child: { connect: { childId: Number(childId) } },
+      timesOfDays: {
+        create: medicationSlots, // Creating medication slots as an array
+      },
+    };
+
+    return this.medicationService.create(prismaData, parent.parentId);
   }
 
   @Get('child/:childId')

@@ -25,13 +25,13 @@ export class MedicationService {
 
     await this.verifyParentChildRelation(parentId, createMedicationDto.child.connect.childId);
 
-    if (!createMedicationDto.startingDate || !createMedicationDto.endingDate) {
+    if (!createMedicationDto.startDate || !createMedicationDto.endDate) {
       throw new BadRequestException("starting and endging Date should be included");
     }
-    if (isNaN(Date.parse(createMedicationDto.startingDate.toString()))) {
+    if (isNaN(Date.parse(createMedicationDto.startDate.toString()))) {
       throw new BadRequestException("Invalid date format, expected ISO-8601 DateTime");
     }
-    if (isNaN(Date.parse(createMedicationDto.endingDate.toString()))) {
+    if (isNaN(Date.parse(createMedicationDto.endDate.toString()))) {
       throw new BadRequestException("Invalid date format, expected ISO-8601 DateTime");
     }
     if (!createMedicationDto.frequency) {
@@ -77,15 +77,46 @@ export class MedicationService {
   }
 
   async findAll(parentId: number, childId: number) {
+
     await this.verifyParentChildRelation(parentId, childId);
 
-    return this.databaseService.medication.findMany({
+    // Fetch medications and their slots
+    const medications = await this.databaseService.medication.findMany({
       where: {
         childId: childId,
         isDeleted: false,
       },
-      include: { medicine: true }
+      include: { timesOfDays: { 
+        orderBy: { medicationSlotId: 'asc' }  // Ordering MedicationSlot by ID in ascending order
+      }}
+      // include: { timesOfDays: true }, // Include MedicationSlot data
     });
+
+    // Transform data into required response format
+    const response = medications.flatMap((med) =>
+      med.timesOfDays.map((slot) => ({
+        id: slot.medicationSlotId,
+        medicineId: med.medicineId,
+        frequency: med.frequency,
+        note: med.note || '',
+        date: slot.date,
+        status: slot.status || 'not_taken',
+        timeOfDay: slot.timeOfDay,
+        amount: slot.amount,
+      }))
+    );
+
+    return response;
+
+    // await this.verifyParentChildRelation(parentId, childId);
+
+    // return this.databaseService.medication.findMany({
+    //   where: {
+    //     childId: childId,
+    //     isDeleted: false,
+    //   },
+    //   include: { medicine: true }
+    // });
   }
 
   async findOne(id: number, parentId: number) {
