@@ -80,7 +80,6 @@ export class MedicationService {
 
     await this.verifyParentChildRelation(parentId, childId);
 
-    // Fetch medications and their slots
     const medications = await this.databaseService.medication.findMany({
       where: {
         childId: childId,
@@ -90,9 +89,8 @@ export class MedicationService {
         where: {
           isDeleted: false,
         },
-        orderBy: { medicationSlotId: 'asc' }  // Ordering MedicationSlot by ID in ascending order
+        orderBy: { medicationSlotId: 'asc' }
       }}
-      // include: { timesOfDays: true }, // Include MedicationSlot data
     });
 
     // Transform data into required response format
@@ -110,16 +108,50 @@ export class MedicationService {
     );
 
     return response;
+  }
 
-    // await this.verifyParentChildRelation(parentId, childId);
+  async findByDate(parentId: number, childId: number, date: Date) {
 
-    // return this.databaseService.medication.findMany({
-    //   where: {
-    //     childId: childId,
-    //     isDeleted: false,
-    //   },
-    //   include: { medicine: true }
-    // });
+    await this.verifyParentChildRelation(parentId, childId);
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const medications = await this.databaseService.medication.findMany({
+      where: {
+        childId: childId,
+        isDeleted: false,
+      },
+      include: { timesOfDays: { 
+        where: {
+          isDeleted: false,
+          date: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+        },
+        orderBy: { medicationSlotId: 'asc' }
+      }}
+    });
+
+    // Transform data into required response format
+    const response = medications.flatMap((med) =>
+      med.timesOfDays.map((slot) => ({
+        id: slot.medicationSlotId,
+        medicineId: med.medicineId,
+        frequency: med.frequency,
+        note: med.note || '',
+        date: slot.date,
+        status: slot.status || 'not_taken',
+        timeOfDay: slot.timeOfDay,
+        amount: slot.amount,
+      }))
+    );
+
+    return response;
   }
 
   async findOne(id: number, parentId: number) {
