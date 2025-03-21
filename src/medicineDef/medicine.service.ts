@@ -33,6 +33,7 @@ export class MedicineService {
       data: {
         ...createMedicineDto,
         medicine: createMedicineDto.medicine ?? { create: {} },
+        compositions: createMedicineDto.compositions ?? { create: [] },
       },
     });
   }
@@ -40,7 +41,10 @@ export class MedicineService {
     return await this.databaseService.medicineDef.findMany({
       where:{
         isDeleted: false
-      }
+      },
+      include: {
+        compositions: true, // Include compositions in the response
+      },
     });
   }
 
@@ -49,7 +53,10 @@ export class MedicineService {
       where:{
         medID:id,
         isDeleted: false
-      }
+      },
+      include: {
+        compositions: true, // Include compositions in the response
+      },
     })
     if(defMedicne==null){
       throw new NotFoundException("medicine with that id not found")
