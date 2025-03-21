@@ -24,7 +24,7 @@ export class MedicineService {
        },
     });
     if (existingMedicineDef) {
-      throw new ConflictException(`A medicine with the name "${name}" already exists in default Medicine.`);
+      throw new ConflictException(`A medicine with the name "${createMedicineDto.name}" already exists in default Medicine.`);
     }
   
     createMedicineDto.isDeleted= false;
