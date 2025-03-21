@@ -239,6 +239,17 @@ model Medicine {
   MedicineAlergy MedicineAlergy[]
 }
 
+model MedicineComposition {
+  compId      Int        @id @default(autoincrement())
+  medID       Int
+  name        String
+  unitOfMeasure String
+  numberOfUnits Int
+  
+  // Relations
+  medicineDef MedicineDef @relation(fields: [medID], references: [medID], onDelete: Cascade)
+}
+
 model MedicineDef {
   medID       Int     @id
   name        String
@@ -248,6 +259,7 @@ model MedicineDef {
 
   // Relations
   medicine Medicine @relation(fields: [medID], references: [medID])
+  compositions MedicineComposition[]
 }
 
 model MedicineCus {
