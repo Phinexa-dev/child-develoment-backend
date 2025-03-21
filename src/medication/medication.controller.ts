@@ -76,6 +76,29 @@ export class MedicationController {
     return this.medicationService.findAll(parent.parentId, childIdNumber);
   }
 
+  @Get('child/:childId/date/:date')
+  @UseGuards(JwtAuthGuard)
+  findByDate(
+    @CurrentUser() parent: Parent,
+    @Param('childId') childId: string,
+    @Param('date') date: string,
+  ) {
+    const childIdNumber = parseInt(childId, 10);
+    
+    if (isNaN(childIdNumber)) {
+      throw new BadRequestException('Invalid childId format.');
+    }
+    
+    const dateObject = new Date(date);
+    
+    if (isNaN(dateObject.getTime())) {
+      throw new BadRequestException('Invalid date format.');
+    }
+
+    // Call the medication service with the parentId, childId, and date
+    return this.medicationService.findByDate(parent.parentId, childIdNumber, dateObject);
+  }
+
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   findOne(
