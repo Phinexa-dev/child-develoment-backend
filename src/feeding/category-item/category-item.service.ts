@@ -3,11 +3,12 @@ import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateCategoryItemDto } from './category-item-dto/create-category-item-dto';
 import { UpdateCategoryItemDto } from './category-item-dto/update-category-item-dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CategoryItemService {
 
-  constructor(private readonly databaseService: DatabaseService) { }
+  constructor(private readonly databaseService: DatabaseService, private readonly configService: ConfigService) { }
 
   async create(createCategoryItemDto: CreateCategoryItemDto, parentId: number) {
     const categoryExists = await this.databaseService.category.findUnique({
@@ -46,21 +47,91 @@ export class CategoryItemService {
 
 
   async findAll(parentID: number) {
-    return this.databaseService.categoryItems.findMany({
-      where: {
-        OR: [
-          { isDefault: true },
-          { parentId: parentID },
-        ],
-        isDeleted: false
-      },
-      include: {
-        category: true,
-      },
-    });
+    try {
+      const baseUrl = this.configService.get<string>('ENV'); // Fetch base URL
+  
+      const categoryItems = await this.databaseService.categoryItems.findMany({
+        where: {
+          OR: [
+            { isDefault: true },
+            { parentId: parentID },
+          ],
+          isDeleted: false,
+        },
+        include: {
+          category: true,
+        },
+      });
+  
+      // Map over the result to update imagePath for both category and item
+      const updatedCategoryItems = categoryItems.map(item => ({
+        ...item,
+        imagePath: item.imagePath 
+          ? `${baseUrl}/food-items/${item.imagePath}` 
+          : null, // Update item imagePath
+        category: {
+          ...item.category,
+          imagePath: item.category.imagePath
+            ? `${baseUrl}/food-categories/${item.category.imagePath}` 
+            : null, // Update category imagePath
+        },
+      }));
+  
+      return updatedCategoryItems;
+    } catch (error) {
+      throw error;
+    }
+    // return this.databaseService.categoryItems.findMany({
+    //   where: {
+    //     OR: [
+    //       { isDefault: true },
+    //       { parentId: parentID },
+    //     ],
+    //     isDeleted: false
+    //   },
+    //   include: {
+    //     category: true,
+    //   },
+    // });
   }
 
   async findOne(id: number, parentID: number) {
+
+    try {
+      const baseUrl = this.configService.get<string>('ENV'); // Fetch base URL
+  
+      const categoryItem = await this.databaseService.categoryItems.findFirst({
+        where: {
+          OR: [
+            { isDefault: true },
+            { parentId: parentID },
+          ],
+          isDeleted: false,
+        },
+        include: {
+          category: true,
+        },
+      });
+  
+      // Map over the result to update imagePath for both category and item
+      const updatedCategoryItem = {
+        ...categoryItem,
+        imagePath: categoryItem.imagePath 
+          ? `${baseUrl}/food-items/${categoryItem.imagePath}` 
+          : null, // Update item imagePath
+        category: {
+          ...categoryItem.category,
+          imagePath: categoryItem.category.imagePath
+            ? `${baseUrl}/food-categories/${categoryItem.category.imagePath}` 
+            : null, // Update category imagePath
+        },
+      };
+  
+      return updatedCategoryItem;
+    } catch (error) {
+      throw error;
+    }
+
     const categoryItem = await this.databaseService.categoryItems.findFirst({
       where: {
         itemId: id,

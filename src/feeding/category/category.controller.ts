@@ -14,7 +14,7 @@ export class CategoryController {
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
-        destination: './uploads/food_categories',
+        destination: './uploads/food-categories',
         filename: (req, file, cb) => {
           const uniqueName = `${Date.now()}-${file.originalname}`;
           cb(null, uniqueName);
@@ -39,7 +39,7 @@ export class CategoryController {
       throw new BadRequestException('Category image is required');
     }
 
-    const imagePath = `food_categories/${file.filename}`; // Store only the relative path
+    const imagePath = `${file.filename}`; // Store only the relative path
     return this.categoryService.create({ ...createCategoryDto, imagePath });
   }
   // create(@Body() createCategoryDto: Prisma.CategoryCreateInput) {
