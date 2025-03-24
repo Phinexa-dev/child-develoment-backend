@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class ArticleService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly databaseService: DatabaseService, private readonly configService: ConfigService) {}
 
   // Create a new article
   async create(createArticleDto: Prisma.ArticleCreateInput) {
@@ -15,6 +16,14 @@ export class ArticleService {
 
   // Find all articles
   async findAll() {
+    const baseUrl = this.configService.get<string>('ENV'); // Get the base URL from env
+
+    const articles = await this.databaseService.article.findMany({});
+
+    return articles.map(article => ({
+      ...article,
+      image: article.image ? `${baseUrl}/articles/${article.image}` : null, // Prepend base URL
+    }));
     return this.databaseService.article.findMany({});
   }
 

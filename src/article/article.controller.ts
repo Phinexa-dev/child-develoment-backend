@@ -43,13 +43,13 @@ async create(
     throw new BadRequestException('Article image is required');
   }
 
-  const imagePath = `articles/${file.filename}`;
+  // const imagePath = `articles/${file.filename}`;
 
   const formattedContent = createArticleDto.content
     .replace(/\r\n/g, '\n')
     .replace(/\n{2,}/g, '\n\n');
 
-  return this.articleService.create({ ...createArticleDto, content: formattedContent, image: imagePath });
+  return this.articleService.create({ ...createArticleDto, content: formattedContent, image: file.filename });
 }
 
   @Get()

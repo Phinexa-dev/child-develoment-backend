@@ -138,7 +138,7 @@ export class ParentService {
 
     if (file) {
       if (existingParent.image) {
-        const oldImagePath = `./uploads/parent-images/${existingParent.image}`;
+        const oldImagePath = `./${existingParent.image}`;
         try {
           unlinkSync(oldImagePath);
         } catch (err) {
@@ -146,7 +146,7 @@ export class ParentService {
         }
       }
 
-      updateParentDto.image = file.filename;
+      updateParentDto.image = `uploads/parent-images/${file.filename}`;
     }
 
     return this.databaseService.parent.update({

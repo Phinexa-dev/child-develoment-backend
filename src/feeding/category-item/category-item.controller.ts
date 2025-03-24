@@ -17,7 +17,7 @@ export class CategoryItemController {
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
-        destination: './uploads/food_items',
+        destination: './uploads/food-items',
         filename: (req, file, cb) => {
           const uniqueName = `${Date.now()}-${file.originalname}`;
           cb(null, uniqueName);
@@ -38,7 +38,7 @@ export class CategoryItemController {
     @Body() createCategoryItemDto: CreateCategoryItemDto,
     @CurrentUser() parent: Parent,
   ) {
-    const imagePath = file ? `food_items/${file.filename}` : null;
+    const imagePath = file ? `${file.filename}` : null;
 
     return this.categoryItemService.create(
       { 

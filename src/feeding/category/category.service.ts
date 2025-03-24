@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class CategoryService {
 
-  constructor(private readonly databaseService: DatabaseService) { }
+  constructor(private readonly databaseService: DatabaseService, private readonly configService: ConfigService) { }
   
 
   async create(createCategoryDto: CreateCategoryDto) {
@@ -40,7 +40,18 @@ export class CategoryService {
       if (!categories.length) {
         throw new NotFoundException('No Categories found');
       }
-      return categories;
+
+      const baseUrl = this.configService.get<string>('ENV'); // Fetch base URL
+
+      // Update each category's imagePath
+      const updatedCategories = categories.map(category => ({
+        ...category,
+        imagePath: category.imagePath 
+          ? `${baseUrl}/food-categories/${category.imagePath}` 
+          : null,
+      }));
+      
+      return updatedCategories;
     } catch (error) {
       throw (error);
     }
@@ -56,7 +67,16 @@ export class CategoryService {
         throw new NotFoundException(`Category with ID #${id} not found`);
       }
 
-      return category;
+      const baseUrl = this.configService.get<string>('ENV'); // Fetch base URL
+
+      const updatedCategory = {
+        ...category,
+        imagePath: category.imagePath 
+          ? `${baseUrl}/food-categories/${category.imagePath}` 
+          : null,
+      };
+
+      return updatedCategory;
     } catch (error) {
       throw (error);
     }
