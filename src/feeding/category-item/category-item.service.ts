@@ -48,7 +48,7 @@ export class CategoryItemService {
 
   async findAll(parentID: number) {
     try {
-      const baseUrl = this.configService.get<string>('ENV'); // Fetch base URL
+      const baseUrl = this.configService.get<string>('ENV_UPLOADS'); // Fetch base URL
   
       const categoryItems = await this.databaseService.categoryItems.findMany({
         where: {
@@ -98,7 +98,7 @@ export class CategoryItemService {
   async findOne(id: number, parentID: number) {
 
     try {
-      const baseUrl = this.configService.get<string>('ENV'); // Fetch base URL
+      const baseUrl = this.configService.get<string>('ENV_UPLOADS'); // Fetch base URL
   
       const categoryItem = await this.databaseService.categoryItems.findFirst({
         where: {

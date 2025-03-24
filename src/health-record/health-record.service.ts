@@ -72,7 +72,7 @@ export class HealthRecordService {
         id: 'desc',
       },
     });
-    const baseUrl = this.configService.getOrThrow('ENV');
+    const baseUrl = this.configService.getOrThrow('ENV_UPLOADS');
     return records.map(record => ({
       ...record,
       file: `${baseUrl}/health-records/${record.file}`,
