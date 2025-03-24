@@ -65,7 +65,7 @@ export class ChildService {
   }
 
   async findAll(parentId: number) {
-    const baseUrl = this.configService.getOrThrow('ENV');
+    const baseUrl = this.configService.getOrThrow('ENV_UPLOADS');
 
     const activeChildren = await this.databaseService.parentChild.findMany({
       where: {
@@ -113,7 +113,7 @@ export class ChildService {
       throw new NotFoundException('Child record not found.');
     }
 
-    const baseUrl = this.configService.getOrThrow('ENV');
+    const baseUrl = this.configService.getOrThrow('ENV_UPLOADS');
     return {
       ...child,
       image: child.image ? `${baseUrl}/uploads/child-images/${child.image}` : null,

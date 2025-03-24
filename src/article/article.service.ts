@@ -16,7 +16,7 @@ export class ArticleService {
 
   // Find all articles
   async findAll() {
-    const baseUrl = this.configService.get<string>('ENV'); // Get the base URL from env
+    const baseUrl = this.configService.get<string>('ENV_UPLOADS'); // Get the base URL from env
 
     const articles = await this.databaseService.article.findMany({});
 

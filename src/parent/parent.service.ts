@@ -109,7 +109,7 @@ export class ParentService {
       throw new NotFoundException(`Parent with ID ${parentId} not found`);
     }
 
-    const baseUrl = this.configService.get<string>('ENV'); // Base URL from environment variable
+    const baseUrl = this.configService.get<string>('ENV_UPLOADS'); // Base URL from environment variable
 
     return {
       ...parent,

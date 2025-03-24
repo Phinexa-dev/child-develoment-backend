@@ -41,7 +41,7 @@ export class CategoryService {
         throw new NotFoundException('No Categories found');
       }
 
-      const baseUrl = this.configService.get<string>('ENV'); // Fetch base URL
+      const baseUrl = this.configService.get<string>('ENV_UPLOADS'); // Fetch base URL
 
       // Update each category's imagePath
       const updatedCategories = categories.map(category => ({
@@ -67,7 +67,7 @@ export class CategoryService {
         throw new NotFoundException(`Category with ID #${id} not found`);
       }
 
-      const baseUrl = this.configService.get<string>('ENV'); // Fetch base URL
+      const baseUrl = this.configService.get<string>('ENV_UPLOADS'); // Fetch base URL
 
       const updatedCategory = {
         ...category,

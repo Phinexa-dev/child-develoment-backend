@@ -136,7 +136,7 @@ export class VaccinationService {
       },
     });
 
-    const baseUrl = this.configService.getOrThrow('ENV')
+    const baseUrl = this.configService.getOrThrow('ENV_UPLOADS')
 
     return vaccinations.map(vaccination => ({
       ...vaccination,
@@ -270,7 +270,7 @@ export class VaccinationService {
       },
     });
 
-    const baseUrl = this.configService.getOrThrow('ENV')
+    const baseUrl = this.configService.getOrThrow('ENV_UPLOADS')
 
     return {
       ...updatedVaccination,
