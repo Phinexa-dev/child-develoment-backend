@@ -116,7 +116,7 @@ export class ChildService {
     const baseUrl = this.configService.getOrThrow('ENV_UPLOADS');
     return {
       ...child,
-      image: child.image ? `${baseUrl}/uploads/child-images/${child.image}` : null,
+      image: child.image ? `${baseUrl}/child-images/${child.image}` : null,
     };
   }
 
