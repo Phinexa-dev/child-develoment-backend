@@ -11,7 +11,7 @@ export class VaccineController {
   constructor(private readonly vaccineService: VaccineService) { }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   create(@Body() createVaccineDto: CreateVaccineDto) {
     return this.vaccineService.create(createVaccineDto);
   }

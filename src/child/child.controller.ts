@@ -38,7 +38,7 @@ export class ChildController {
     @Body() createChildDto: CreateChildDto,
     @CurrentUser() parent: Parent,
   ) {
-    const imagePath = file ? `uploads/child-images/${file.filename}` : null;
+    const imagePath = file ? `${file.filename}` : null;
 
     return this.childService.create(
       { ...createChildDto, image: imagePath },
