@@ -27,6 +27,11 @@ export class UpdateVaccinationDto {
 
     @ApiPropertyOptional()
     @IsOptional()
+    @IsString()
+    status?: string;
+
+    @ApiPropertyOptional()
+    @IsOptional()
     @IsArray()
     @IsInt({ each: true })
     @Transform(({ value }) =>

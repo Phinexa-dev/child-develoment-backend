@@ -9,7 +9,7 @@ export class SymptomController {
   constructor(private readonly symptomService: SymptomService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   create(@Body() createSymptomDto: CreateSymptomDto) {
     return this.symptomService.create(createSymptomDto);
   }
