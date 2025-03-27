@@ -34,14 +34,14 @@ export class SolidService {
           where: {
             itemId,
             isDeleted: false,
-            AND: [
-              {
-                OR: [
-                  // { isDefault: true },
-                  { parentId: parentId },
-                ],
-              },
-            ],
+            // AND: [
+            //   {
+            //     OR: [
+            //       // { isDefault: true },
+            //       { parentId: parentId },
+            //     ],
+            //   },
+            // ],
           },
         });
 
