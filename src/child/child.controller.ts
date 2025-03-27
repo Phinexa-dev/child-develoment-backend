@@ -85,9 +85,14 @@ export class ChildController {
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() parent: Parent,
   ) {
-    const imagePath = file ? file.filename : null;
+    // const imagePath = file ? file.filename : null;
+    const updateData = { ...updateChildDto };
 
-    return this.childService.update(id, { ...updateChildDto, image: imagePath }, parent.parentId);
+    if (file) {
+      updateData.image = file.filename;
+    }
+
+    return this.childService.update(id, updateData, parent.parentId);
   }
 
   @Get('delete/:id')
