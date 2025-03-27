@@ -61,6 +61,9 @@ export class CategoryService {
     try {
       const category = await this.databaseService.category.findUnique({
         where: { categoryId: id },
+        include: {
+          items: true,
+        },
       });
 
       if (!category) {
@@ -74,6 +77,13 @@ export class CategoryService {
         imagePath: category.imagePath 
           ? `${baseUrl}/food-categories/${category.imagePath}` 
           : null,
+        items: category.items.map(item => ({
+          itemId: item.itemId,
+          itemName: item.itemName,
+          imagePath: item.imagePath 
+            ? `${baseUrl}/food-items/${item.imagePath}` 
+            : null,
+        })),
       };
 
       return updatedCategory;
