@@ -30,11 +30,35 @@ export class GrowthService {
     if (!createGrowthDto.height && !createGrowthDto.weight && !createGrowthDto.note) {
       throw new BadRequestException('body should at least contain either note,weight or height')
     }
+
+    // Fetch the latest record to fill missing values
+    const lastRecord = await this.databaseService.growth.findFirst({
+      where: { childId: createGrowthDto.childId, isDeleted: false },
+      orderBy: { date: 'desc' },
+    });
+
+    // Fill missing values with last known values if available
+    let weight = createGrowthDto.weight;
+    let height = createGrowthDto.height;
+
+    if (!weight && lastRecord) {
+      weight = lastRecord.weight;
+    }
+
+    if (!height && lastRecord) {
+      height = lastRecord.height;
+    }
+
+    // Throw error if both weight and height are still missing
+    if (!weight && !height) {
+      throw new BadRequestException('Either weight or height must be provided');
+    }
+
     return await this.databaseService.growth.create({
       data: {
         date: createGrowthDto.date,
-        weight: createGrowthDto.weight,
-        height: createGrowthDto.height,
+        weight: weight,
+        height: height,
         note: createGrowthDto.note,
         child: {
           connect: { childId: createGrowthDto.childId },
@@ -67,6 +91,132 @@ export class GrowthService {
         date: 'desc'
       }
     });
+  }
+
+  async getChildHeightGrowth(parentId: number, childId: number) {
+    await this.verifyParentChildRelation(parentId, childId);
+
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth();
+
+    // Fetch average height grouped by month for the current year
+    const records = await this.databaseService.growth.findMany({
+      where: {
+        childId: childId,
+        isDeleted: false,
+        date: {
+          gte: new Date(currentYear, 0, 1),
+          lte: new Date(currentYear, 11, 31),
+        },
+      },
+      select: {
+        date: true,
+        height: true,
+      },
+      orderBy: { date: 'asc' },
+    });
+
+    const monthMap = Array.from({ length: 12 }, (_, i) => ({
+      month: new Date(currentYear, i).toLocaleString('default', { month: 'long' }),
+      growth: 0,
+    }));
+
+    const monthlyHeights = {};
+
+    // Group heights by month
+    records.forEach(record => {
+      const recordMonth = new Date(record.date).getMonth();
+      if (!monthlyHeights[recordMonth]) {
+        monthlyHeights[recordMonth] = [];
+      }
+      monthlyHeights[recordMonth].push(record.height);
+    });
+
+    let previousAvgHeight = null;
+
+    // Calculate average growth for each month
+    for (let i = 0; i <= currentMonth; i++) {
+      if (monthlyHeights[i] && monthlyHeights[i].length > 0) {
+        const sum = monthlyHeights[i].reduce((a, b) => a + b, 0);
+        const avgHeight = sum / monthlyHeights[i].length;
+
+        if (previousAvgHeight !== null) {
+          monthMap[i].growth = avgHeight - previousAvgHeight;
+        }
+
+        previousAvgHeight = avgHeight;
+      }
+    }
+
+    // Set future months to zero
+    for (let i = currentMonth + 1; i < 12; i++) {
+      monthMap[i].growth = 0;
+    }
+
+    return monthMap;
+  }
+
+  async getChildWeightGrowth(parentId: number, childId: number) {
+    await this.verifyParentChildRelation(parentId, childId);
+    
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth();
+
+    // Fetch average height grouped by month for the current year
+    const records = await this.databaseService.growth.findMany({
+      where: {
+        childId: childId,
+        isDeleted: false,
+        date: {
+          gte: new Date(currentYear, 0, 1),
+          lte: new Date(currentYear, 11, 31),
+        },
+      },
+      select: {
+        date: true,
+        weight: true,
+      },
+      orderBy: { date: 'asc' },
+    });
+
+    const monthMap = Array.from({ length: 12 }, (_, i) => ({
+      month: new Date(currentYear, i).toLocaleString('default', { month: 'long' }),
+      growth: 0,
+    }));
+
+    const monthlyHeights = {};
+
+    // Group heights by month
+    records.forEach(record => {
+      const recordMonth = new Date(record.date).getMonth();
+      if (!monthlyHeights[recordMonth]) {
+        monthlyHeights[recordMonth] = [];
+      }
+      monthlyHeights[recordMonth].push(record.weight);
+    });
+
+    let previousAvgHeight = null;
+
+    // Calculate average growth for each month
+    for (let i = 0; i <= currentMonth; i++) {
+      if (monthlyHeights[i] && monthlyHeights[i].length > 0) {
+        const sum = monthlyHeights[i].reduce((a, b) => a + b, 0);
+        const avgHeight = sum / monthlyHeights[i].length;
+
+        if (previousAvgHeight !== null) {
+          monthMap[i].growth = avgHeight - previousAvgHeight;
+        }
+
+        previousAvgHeight = avgHeight;
+      }
+    }
+
+    // Set future months to zero
+    for (let i = currentMonth + 1; i < 12; i++) {
+      monthMap[i].growth = 0;
+    }
+
+    return monthMap;
   }
 
   async findAll(parentId: number, childId: number, limit: number, offset: number) {
@@ -237,8 +387,8 @@ export class GrowthService {
       return !(recordMonth === lastRecordMonth && recordYear === lastRecordYear);
     });
 
-    let heightGrowth = null;
-    let monthsDifference = null;
+    let heightGrowth = 0;
+    let monthsDifference = 0;
 
     if (filteredRecords.length > 0) {
       const nearestRecord = filteredRecords[0];
@@ -274,7 +424,7 @@ export class GrowthService {
     });
 
     if (records.length === 0) {
-      return records;
+      throw new NotFoundException("No weight records found for this child.");
     }
 
     const lastRecord = records[0];
@@ -289,8 +439,8 @@ export class GrowthService {
       return !(recordMonth === lastRecordMonth && recordYear === lastRecordYear);
     });
 
-    let weightGrowth = null;
-    let monthsDifference = null;
+    let weightGrowth = 0;
+    let monthsDifference = 0;
 
     if (filteredRecords.length > 0) {
       const nearestRecord = filteredRecords[0];

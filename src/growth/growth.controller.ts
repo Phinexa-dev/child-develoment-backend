@@ -161,4 +161,30 @@ export class GrowthController {
     }
     return this.growthService.summaryWeight(parent.parentId, childID);
   }
+
+  @Get('weight/chart/:childId')
+  @UseGuards(JwtAuthGuard)
+  async weightChartData(
+    @Param('childId') childId,
+    @CurrentUser() parent: Parent,
+  ) {
+    const childID = parseInt(childId, 10)
+    if (isNaN(childID)) {
+      throw new BadRequestException('Invalid childId format.');
+    }
+    return this.growthService.getChildWeightGrowth(parent.parentId, childID);
+  }
+
+  @Get('height/chart/:childId')
+  @UseGuards(JwtAuthGuard)
+  async heightChartData(
+    @Param('childId') childId,
+    @CurrentUser() parent: Parent,
+  ) {
+    const childID = parseInt(childId, 10)
+    if (isNaN(childID)) {
+      throw new BadRequestException('Invalid childId format.');
+    }
+    return this.growthService.getChildHeightGrowth(parent.parentId, childID);
+  }
 }
