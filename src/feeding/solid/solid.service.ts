@@ -4,11 +4,12 @@ import { Prisma } from '@prisma/client';
 import { CreateSolidDto } from './dto/create-solid-dto';
 import { off } from 'process';
 import { UpdateSolidDto } from './dto/update-solid-dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SolidService {
 
-  constructor(private readonly databaseService: DatabaseService) { }
+  constructor(private readonly databaseService: DatabaseService, private readonly configService: ConfigService) { }
 
   private async verifyParentChildRelation(parentId: number, childId: number) {
     const parentChildRelation = await this.databaseService.parentChild.findFirst({
@@ -76,44 +77,100 @@ export class SolidService {
 
   async findAll(parentId: number, childId: number, limit: number, offset: number) {
     await this.verifyParentChildRelation(parentId, childId);
+  
+  const baseUrl = this.configService.get<string>('ENV_UPLOADS'); // Get the base URL from env
 
-    const data = await this.databaseService.solids.findMany({
-      where: {
-        childId: childId,
-        isDeleted: false,
-        categories: {
-          some: {
-            isDeleted: false
-          }
+  const data = await this.databaseService.solids.findMany({
+    where: {
+      childId: childId,
+      isDeleted: false,
+      categories: {
+        some: {
+          isDeleted: false
         }
-      },
-      select: {
-        solidId: true,
-        reaction: true,
-        note: true,
-        dateTime: true,
-        categories: {
-          select: {
-            id: true,
-            numberOfUnits: true,
-            unitOfMeasure: true,
-            categoryItem: {
-              select: {
-                itemId: true,
-                itemName: true,
-                imagePath: true
-              }
+      }
+    },
+    select: {
+      solidId: true,
+      reaction: true,
+      note: true,
+      dateTime: true,
+      categories: {
+        select: {
+          id: true,
+          numberOfUnits: true,
+          unitOfMeasure: true,
+          categoryItem: {
+            select: {
+              itemId: true,
+              itemName: true,
+              imagePath: true
             }
           }
         }
-      },
-      take: limit,
-      skip: offset,
-      orderBy: {
-        dateTime: 'desc'
       }
-    });
-    return transformResponse(data);
+    },
+    take: limit,
+    skip: offset,
+    orderBy: {
+      dateTime: 'desc'
+    }
+  });
+
+  // Map through the result to modify the imagePath
+  const transformedData = data.map(solid => ({
+    ...solid,
+    categories: solid.categories.map(category => ({
+      ...category,
+      categoryItem: {
+        ...category.categoryItem,
+        imagePath: category.categoryItem.imagePath
+          ? `${baseUrl}/food-items/${category.categoryItem.imagePath}` // Prepend base URL
+          : null
+      }
+    }))
+  }));
+
+  return transformResponse(transformedData);
+    // await this.verifyParentChildRelation(parentId, childId);
+
+    // const data = await this.databaseService.solids.findMany({
+    //   where: {
+    //     childId: childId,
+    //     isDeleted: false,
+    //     categories: {
+    //       some: {
+    //         isDeleted: false
+    //       }
+    //     }
+    //   },
+    //   select: {
+    //     solidId: true,
+    //     reaction: true,
+    //     note: true,
+    //     dateTime: true,
+    //     categories: {
+    //       select: {
+    //         id: true,
+    //         numberOfUnits: true,
+    //         unitOfMeasure: true,
+    //         categoryItem: {
+    //           select: {
+    //             itemId: true,
+    //             itemName: true,
+    //             imagePath: true
+    //           }
+    //         }
+    //       }
+    //     }
+    //   },
+    //   take: limit,
+    //   skip: offset,
+    //   orderBy: {
+    //     dateTime: 'desc'
+    //   }
+    // });
+    // return transformResponse(data);
   }
 
   async findOne(parentId: number, solidId: number) {
