@@ -98,6 +98,7 @@ export class SolidService {
       categories: {
         select: {
           id: true,
+          itemId: true,
           numberOfUnits: true,
           unitOfMeasure: true,
           categoryItem: {
@@ -342,7 +343,7 @@ function transformResponse(data) {
     note: item.note,
     dateTime: item.dateTime,
     ingredients: item.categories.map(category => ({
-      id: category.id,
+      id: category.itemId,
       name: category.categoryItem.itemName,
       unitOfMeasure: category.unitOfMeasure,
       numberOfUnits: category.numberOfUnits || 0,
