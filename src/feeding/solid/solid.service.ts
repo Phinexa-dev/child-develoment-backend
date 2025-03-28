@@ -96,6 +96,7 @@ export class SolidService {
       note: true,
       dateTime: true,
       categories: {
+        where: { isDeleted: false },
         select: {
           id: true,
           itemId: true,
@@ -248,7 +249,7 @@ export class SolidService {
         isDeleted: false,
       },
       include: {
-        categories: { select: { id: true, isDeleted: true } },
+        categories: { select: { itemId: true, isDeleted: true } },
       },
     });
 
@@ -259,15 +260,17 @@ export class SolidService {
     await this.verifyParentChildRelation(parentId, solid.childId);
 
     if (ingredients && ingredients.length > 0) {
-      const existingIngredientIds = solid.categories.map(ingredient => ingredient.id);
+      // const existingCategories = solid.categories;
+      const existingIngredientIds = solid.categories.map(ingredient => ingredient.itemId);
       const ingredientIdsToUpdate = ingredients.map(i => i.id);
 
-      const ingredientsToDelete = existingIngredientIds.filter(id => !ingredientIdsToUpdate.includes(id));
+      const ingredientsToDelete = existingIngredientIds.filter(itemId => !ingredientIdsToUpdate.includes(itemId));
       const ingredientsToAdd = ingredients.filter(i => !existingIngredientIds.includes(i.id));
+      const ingredientsToUpdate = ingredients.filter(i => existingIngredientIds.includes(i.id));
 
       await this.databaseService.solidCat.updateMany({
         where: {
-          id: { in: ingredientsToDelete },
+          itemId: { in: ingredientsToDelete },
           solidId: id,
         },
         data: { isDeleted: true },
@@ -293,6 +296,22 @@ export class SolidService {
           })
         )
       );
+
+      await Promise.all(
+        ingredientsToUpdate.map(ingredient =>
+          this.databaseService.solidCat.updateMany({
+            where: {
+              solidId: id,
+              itemId: ingredient.id,
+            },
+            data: {
+              unitOfMeasure: ingredient.unitOfMeasure,
+              numberOfUnits: ingredient.numberOfUnits,
+            },
+          })
+        )
+      );
+
     } else if (ingredients && ingredients.length === 0) {
       await this.databaseService.solidCat.updateMany({
         where: { solidId: id },
