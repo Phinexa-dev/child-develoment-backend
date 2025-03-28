@@ -1,4 +1,5 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, HttpException, HttpStatus } from '@nestjs/common';
+import { MailerService } from '@nestjs-modules/mailer';
 import { compare, hash } from 'bcryptjs';
 import { ParentService } from 'src/parent/parent.service';
 import { ConfigService } from '@nestjs/config'
@@ -7,6 +8,7 @@ import { Parent } from '@prisma/client';
 import { TokenPayload } from './token-payload.interface';
 import { Response } from 'express';
 import { DatabaseService } from 'src/database/database.service';
+import { PasswordResetRequest } from './dto/password-reset-request';
 
 
 @Injectable()
@@ -14,7 +16,8 @@ export class AuthService {
     constructor(private readonly parentService: ParentService,
         private readonly configService: ConfigService,
         private readonly jwtService: JwtService,
-        private readonly databaseService: DatabaseService
+        private readonly databaseService: DatabaseService,
+        private readonly mailerService: MailerService,
     ) { }
 
     async login(parent: Parent, response: Response) {
@@ -91,5 +94,34 @@ export class AuthService {
             throw new UnauthorizedException('Refresh Token is not valid')
 
         }
+    }
+
+    async forgetPassword(forgetPasswordRequest: { email: string }) {
+        const { email } = forgetPasswordRequest;
+    
+        // Check if user exists
+        const user = await this.databaseService.parent.findFirst({
+            where: { email },
+        });
+        if (!user) {
+          throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+        }
+    
+        // Generate a 6-digit PIN
+        const pin = Math.floor(100000 + Math.random() * 900000).toString();
+    
+        await this.mailerService.sendMail({
+            to: email,
+            subject: 'Password Reset PIN',
+            text: `Hello,\n\nYour password reset PIN is: ${pin}\nThis PIN will expire in 10 minutes.`,
+            html: `<h1>Password Reset</h1><p>Your password reset PIN is: <strong>${pin}</strong></p><p>This PIN will expire in 10 minutes.</p>`,
+        });
+    
+        // Return the PIN (for frontend validation)
+        return { pin, message: 'Reset PIN sent to your email' };
+    }
+
+    async passwordReset(passwordResetRequest: PasswordResetRequest) {
+        
     }
 }

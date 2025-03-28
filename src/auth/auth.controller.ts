@@ -8,6 +8,8 @@ import { JwtRefreshAuthGuard } from './guards/jwt-refresg-auth.guard';
 import { ParentService } from 'src/parent/parent.service';
 import { CreateParentRequest } from 'src/parent/dto/create-parent.request';
 import { ApiTags } from '@nestjs/swagger';
+import { ForgetPasswordRequest } from './dto/forgetpassword-request';
+import { PasswordResetRequest } from './dto/password-reset-request';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -34,6 +36,18 @@ export class AuthController {
     @Post('signup')
     async signup( @Body() createParentDto: CreateParentRequest) {
       return await this.parentService.create(createParentDto);
+    }
+
+    @Post('forgetpassword')
+    // @UseGuards(LocalAuthGuard)
+    async forgetpassword( @Body() forgetPasswordRequest: ForgetPasswordRequest) {
+      return await this.authService.forgetPassword(forgetPasswordRequest);
+    }
+
+    @Post('passwordreset')
+    // @UseGuards(LocalAuthGuard)
+    async passwordreset( @Body() passwordResetRequest: PasswordResetRequest) {
+      return await this.parentService.forgetPasswordReset(passwordResetRequest);
     }
 
 }
