@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -21,7 +22,25 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
         signOptions: { expiresIn:`${configService.getOrThrow('JWT_ACCESS_TOKEN_EXPIRATION')}ms` },
       }),
     }),
-    ConfigModule, // Add ConfigModule here
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          host: configService.getOrThrow<string>('EMAIL_HOST'),
+          port: configService.get<number>('EMAIL_PORT') || 587,
+          secure: false,
+          auth: {
+            user: configService.getOrThrow<string>('EMAIL_USERNAME'),
+            pass: configService.getOrThrow<string>('EMAIL_PASSWORD'),
+          },
+        },
+        defaults: {
+          from: `"No Reply" <${configService.getOrThrow<string>('EMAIL_FROM')}>`,
+        },
+      }),
+    }),
+    ConfigModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy,JwtStrategy,JwtRefreshStrategy],

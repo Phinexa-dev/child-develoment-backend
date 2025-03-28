@@ -1,4 +1,4 @@
-import { BadRequestException, ConsoleLogger, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConsoleLogger, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { hash } from 'bcryptjs'
 import { DatabaseService } from 'src/database/database.service';
@@ -6,6 +6,7 @@ import { CreateParentRequest } from './dto/create-parent.request';
 import { unlinkSync } from 'fs';
 import { UpdateParentDto } from './dto/update-parent-dto';
 import { ConfigService } from '@nestjs/config';
+import { PasswordResetRequest } from 'src/auth/dto/password-reset-request';
 
 
 @Injectable()
@@ -153,5 +154,29 @@ export class ParentService {
       where: { parentId },
       data: updateParentDto,
     });
+  }
+
+  async forgetPasswordReset(forgetPasswordRequest: PasswordResetRequest) {
+    const { email, password } = forgetPasswordRequest;
+  
+    // Check if user exists
+    const user = await this.databaseService.parent.findFirst({
+      where: { email },
+    });
+  
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+  
+    // Update the password in the database
+    const updatedUser = await this.databaseService.parent.update({
+      where: { email },
+      data: { password: await hash(password, 10) },
+    });
+  
+    return {
+      message: 'Password successfully updated',
+      email: updatedUser.email,
+    };
   }
 }
