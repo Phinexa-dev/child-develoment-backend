@@ -54,15 +54,15 @@ export class CategoryItemController {
   // }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  findAll(@CurrentUser() parent: Parent) {
-    return this.categoryItemService.findAll(parent.parentId);
+  // @UseGuards(JwtAuthGuard)
+  findAll() {
+    return this.categoryItemService.findAll();
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: string, @CurrentUser() parent: Parent) {
-    return this.categoryItemService.findOne(+id, parent.parentId);
+  // @UseGuards(JwtAuthGuard)
+  findOne(@Param('id') id: string,) {
+    return this.categoryItemService.findOne(+id);
   }
 
   @Post(':id')

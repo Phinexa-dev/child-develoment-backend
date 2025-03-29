@@ -46,16 +46,16 @@ export class CategoryItemService {
   }
 
 
-  async findAll(parentID: number) {
+  async findAll() {
     try {
       const baseUrl = this.configService.get<string>('ENV_UPLOADS'); // Fetch base URL
   
       const categoryItems = await this.databaseService.categoryItems.findMany({
         where: {
-          OR: [
-            { isDefault: true },
-            { parentId: parentID },
-          ],
+          // OR: [
+          //   { isDefault: true },
+          //   { parentId: parentID },
+          // ],
           isDeleted: false,
         },
         include: {
@@ -95,17 +95,17 @@ export class CategoryItemService {
     // });
   }
 
-  async findOne(id: number, parentID: number) {
+  async findOne(id: number) {
 
     try {
       const baseUrl = this.configService.get<string>('ENV_UPLOADS'); // Fetch base URL
   
       const categoryItem = await this.databaseService.categoryItems.findFirst({
         where: {
-          OR: [
-            { isDefault: true },
-            { parentId: parentID },
-          ],
+          // OR: [
+          //   { isDefault: true },
+          //   { parentId: parentID },
+          // ],
           isDeleted: false,
         },
         include: {
@@ -131,25 +131,6 @@ export class CategoryItemService {
     } catch (error) {
       throw error;
     }
-
-    const categoryItem = await this.databaseService.categoryItems.findFirst({
-      where: {
-        itemId: id,
-        OR: [
-          { isDefault: true },
-          { parentId: parentID },
-        ],
-        isDeleted: false
-      },
-      include: {
-        category: true,
-      },
-    });
-
-    if (!categoryItem) {
-      throw new NotFoundException(`CategoryItem with id ${id} not found or does not belong to the user.`);
-    }
-    return categoryItem;
   }
 
   async update(id: number, parentId: number, updateCategoryItemDto: UpdateCategoryItemDto) {

@@ -100,11 +100,13 @@ export class AuthService {
         const { email } = forgetPasswordRequest;
     
         // Check if user exists
-        const user = await this.databaseService.parent.findFirst({
-            where: { email },
-        });
-        if (!user) {
-          throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+        if (purpose == "Password Reset") {
+            const user = await this.databaseService.parent.findFirst({
+                where: { email },
+            });
+            if (!user) {
+                throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+            }
         }
     
         // Generate a 6-digit PIN
@@ -123,9 +125,5 @@ export class AuthService {
     
         // Return the PIN (for frontend validation)
         return { pin, message: 'Reset PIN sent to your email' };
-    }
-
-    async passwordReset(passwordResetRequest: PasswordResetRequest) {
-        
     }
 }
