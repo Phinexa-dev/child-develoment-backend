@@ -41,7 +41,13 @@ export class AuthController {
     @Post('forgetpassword')
     // @UseGuards(LocalAuthGuard)
     async forgetpassword( @Body() forgetPasswordRequest: ForgetPasswordRequest) {
-      return await this.authService.forgetPassword(forgetPasswordRequest);
+      return await this.authService.emailVerification(forgetPasswordRequest, "Password Reset");
+    }
+
+    @Post('verifyemail')
+    // @UseGuards(LocalAuthGuard)
+    async emailverification( @Body() forgetPasswordRequest: ForgetPasswordRequest) {
+      return await this.authService.emailVerification(forgetPasswordRequest, "Email Verification");
     }
 
     @Post('passwordreset')

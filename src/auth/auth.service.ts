@@ -96,7 +96,7 @@ export class AuthService {
         }
     }
 
-    async forgetPassword(forgetPasswordRequest: { email: string }) {
+    async emailVerification(forgetPasswordRequest: { email: string }, purpose: string) {
         const { email } = forgetPasswordRequest;
     
         // Check if user exists
@@ -112,9 +112,13 @@ export class AuthService {
     
         await this.mailerService.sendMail({
             to: email,
-            subject: 'Password Reset PIN',
-            text: `Hello,\n\nYour password reset PIN is: ${pin}\nThis PIN will expire in 10 minutes.`,
-            html: `<h1>Password Reset</h1><p>Your password reset PIN is: <strong>${pin}</strong></p><p>This PIN will expire in 10 minutes.</p>`,
+            subject: `${purpose} PIN`,
+            text: `Hello,\n\nYour ${purpose.toLowerCase()} PIN is: ${pin}\nThis PIN will expire in 10 minutes.`,
+            html: `
+                <h1>${purpose}</h1>
+                <p>Your ${purpose.toLowerCase()} PIN is: <strong>${pin}</strong></p>
+                <p>This PIN will expire in 10 minutes.</p>
+            `,
         });
     
         // Return the PIN (for frontend validation)
