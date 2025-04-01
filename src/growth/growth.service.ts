@@ -372,7 +372,8 @@ export class GrowthService {
     });
 
     if (records.length === 0) {
-      throw new NotFoundException("No height records found for this child.");
+      return {};
+      // throw new NotFoundException("No height records found for this child.");
     }
 
     const lastRecord = records[0];
@@ -424,7 +425,8 @@ export class GrowthService {
     });
 
     if (records.length === 0) {
-      throw new NotFoundException("No weight records found for this child.");
+      return {};
+      // throw new NotFoundException("No weight records found for this child.");
     }
 
     const lastRecord = records[0];

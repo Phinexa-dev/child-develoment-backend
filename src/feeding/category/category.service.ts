@@ -38,7 +38,8 @@ export class CategoryService {
       const categories = await this.databaseService.category.findMany({
       });
       if (!categories.length) {
-        throw new NotFoundException('No Categories found');
+        return [];
+        // throw new NotFoundException('No Categories found');
       }
 
       const baseUrl = this.configService.get<string>('ENV_UPLOADS'); // Fetch base URL

@@ -38,10 +38,7 @@ export class MilkTypeService {
       const milkTypes = await this.databaseService.milkType.findMany({
         where: { isDeleted: false }
       });
-      if (!milkTypes.length) {
-        throw new NotFoundException('No milk types found');
-      }
-      return milkTypes;
+      return milkTypes.length ? milkTypes : [];
     } catch (error) {
       throw (error);
     }

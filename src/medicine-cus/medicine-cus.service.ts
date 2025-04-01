@@ -80,11 +80,11 @@ export class MedicineCusService {
         parentId,
         isDeleted: false
       }
-  })
-  
-  if(existingMed ==null){
-    throw new NotFoundException("Medicine not found");
-  }
+    })
+    
+    if(existingMed ==null){
+      throw new NotFoundException("Medicine not found");
+    }
     return this.databaseService.medicineCus.update({
       where:{medID:id},
       data: updateMedicineCusDto
@@ -98,10 +98,10 @@ export class MedicineCusService {
         parentId,
         isDeleted: false
       }
-  })
-  if(existingMed ==null){
-    throw new NotFoundException("Medicine not found");
-  }
+    })
+    if(existingMed ==null){
+      throw new NotFoundException("Medicine not found");
+    }
     return this.databaseService.medicineCus.update({
       where:{medID:id},
       data:{
