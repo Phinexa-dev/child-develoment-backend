@@ -8,19 +8,19 @@ export class MedicineController {
   constructor(private readonly medicineService: MedicineService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   create(@Body() createMedicineDto: Prisma.MedicineDefCreateInput) {
     return this.medicineService.create(createMedicineDto);
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   findAll() {
     return this.medicineService.findAll();
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string) {
     const Id= parseInt(id,10);
     if(isNaN(Id)){
@@ -30,7 +30,7 @@ export class MedicineController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   update(@Param('id') id: string, @Body() updateMedicineDto: Prisma.MedicineDefUpdateInput) {
     const Id= parseInt(id,10);
     if(isNaN(Id)){
@@ -40,7 +40,7 @@ export class MedicineController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string) {
     const Id= parseInt(id,10);
     if(isNaN(Id)){
