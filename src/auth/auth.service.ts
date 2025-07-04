@@ -112,16 +112,21 @@ export class AuthService {
         // Generate a 6-digit PIN
         const pin = Math.floor(100000 + Math.random() * 900000).toString();
     
-        await this.mailerService.sendMail({
-            to: email,
-            subject: `${purpose} PIN`,
-            text: `Hello,\n\nYour ${purpose.toLowerCase()} PIN is: ${pin}\nThis PIN will expire in 10 minutes.`,
-            html: `
-                <h1>${purpose}</h1>
-                <p>Your ${purpose.toLowerCase()} PIN is: <strong>${pin}</strong></p>
-                <p>This PIN will expire in 10 minutes.</p>
-            `,
-        });
+        try {
+            await this.mailerService.sendMail({
+                to: email,
+                subject: `${purpose} PIN`,
+                text: `Hello,\n\nYour ${purpose.toLowerCase()} PIN is: ${pin}\nThis PIN will expire in 10 minutes.`,
+                html: `
+                    <h1>${purpose}</h1>
+                    <p>Your ${purpose.toLowerCase()} PIN is: <strong>${pin}</strong></p>
+                    <p>This PIN will expire in 10 minutes.</p>
+                `,
+            });
+        } catch (error) {
+            console.error('Error sending email:', error);
+            throw new HttpException('Failed to send email', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     
         // Return the PIN (for frontend validation)
         return { pin, message: 'Reset PIN sent to your email' };

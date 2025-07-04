@@ -445,3 +445,10 @@ model HealthRecords {
   date      DateTime @default(now())
   child     Child    @relation(fields: [childId], references: [childId])
 }
+
+model Feedback {
+  id                     Int      @id @default(autoincrement())
+  lovedFeatures        String?
+  wishToHaveFeatures   String?
+  struggleToUseFeatures String?
+}
