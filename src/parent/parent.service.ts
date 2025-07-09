@@ -34,7 +34,7 @@ export class ParentService {
       lastName: createParentDto.lastName,
       email: createParentDto.email,
       password: (await hash(createParentDto.password, 10)),
-      phoneNumber: createParentDto.phoneNumber,
+      phoneNumber: createParentDto.phoneNumber || null,
       image: createParentDto.image || null,
       bloodGroup: createParentDto.bloodGroup || null,
       address: createParentDto.address || null,
