@@ -24,11 +24,13 @@ export class CreateParentRequest {
 
   @ApiProperty()
   image: string;
+  
   @ApiProperty()
   bloodGroup: string;
+  
   @ApiProperty()
-  @IsNotEmpty()
   phoneNumber: string;
+  
   @ApiProperty()
   address: string;
 }

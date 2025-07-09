@@ -41,7 +41,7 @@ model Parent {
   password     String
   image        String?
   bloodGroup   String?
-  phoneNumber  String  @unique
+  phoneNumber  String?  @unique
   address      String?
   refreshToken String?
 
