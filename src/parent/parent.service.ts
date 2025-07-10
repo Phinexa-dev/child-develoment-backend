@@ -23,11 +23,13 @@ export class ParentService {
       throw new BadRequestException('Email is already in use');
     }
 
-    const existingNumber = await this.databaseService.parent.findFirst({
-      where: { phoneNumber: createParentDto.phoneNumber },
-    });
-    if (existingNumber) {
-      throw new BadRequestException('Phone number is already in use');
+    if(createParentDto.phoneNumber){
+      const existingNumber = await this.databaseService.parent.findFirst({
+        where: { phoneNumber: createParentDto.phoneNumber },
+      });
+      if (existingNumber) {
+        throw new BadRequestException('Phone number is already in use');
+      }
     }
     const createParentData: Prisma.ParentCreateInput = {
       firstName: createParentDto.firstName,
