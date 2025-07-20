@@ -353,6 +353,7 @@ model Article {
   image     String? // Optional field
   date      DateTime
   author    String
+  citation    String?
 }
 
 model Allergies{
