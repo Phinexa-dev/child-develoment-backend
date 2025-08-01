@@ -90,7 +90,7 @@ model ParentChild {
   requestedDate DateTime
 
   // Relations
-  parent Parent @relation(fields: [parentId], references: [parentId])
+  parent Parent @relation(fields: [parentId], references: [parentId], onDelete: Cascade)
   child  Child  @relation(fields: [childId], references: [childId])
 }
 
@@ -101,7 +101,7 @@ model OldPasswords {
   changedOn DateTime
 
   // Relations
-  parent Parent @relation(fields: [parentId], references: [parentId])
+  parent Parent @relation(fields: [parentId], references: [parentId], onDelete: Cascade)
 }
 
 model Nursing {
