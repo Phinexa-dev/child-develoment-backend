@@ -57,10 +57,11 @@ export class AuthController {
       return await this.parentService.forgetPasswordReset(passwordResetRequest);
     }
 
-    @Delete(':id')
+    @Delete()
     @UseGuards(JwtAuthGuard)
-    async deleteAccount(@Param('id') id: number) {
-      return await this.parentService.remove(id);
+    async deleteAccount(@Request() req) {
+      const userId = req.user.parentId;
+      return await this.parentService.remove(userId);
     }
 
 }
