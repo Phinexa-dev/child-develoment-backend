@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Request, Res, Body } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Res, Body, Delete, Param } from '@nestjs/common';
 import { LocalAuthGuard } from './guards/local-auth-guard';
 import { CurrentUser } from './current-user.decorator';
 import { Prisma, Parent } from '@prisma/client';
@@ -10,6 +10,7 @@ import { CreateParentRequest } from 'src/parent/dto/create-parent.request';
 import { ApiTags } from '@nestjs/swagger';
 import { ForgetPasswordRequest } from './dto/forgetpassword-request';
 import { PasswordResetRequest } from './dto/password-reset-request';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -54,6 +55,13 @@ export class AuthController {
     // @UseGuards(LocalAuthGuard)
     async passwordreset( @Body() passwordResetRequest: PasswordResetRequest) {
       return await this.parentService.forgetPasswordReset(passwordResetRequest);
+    }
+
+    @Delete()
+    @UseGuards(JwtAuthGuard)
+    async deleteAccount(@Request() req) {
+      const userId = req.user.parentId;
+      return await this.parentService.remove(userId);
     }
 
 }
